@@ -6,7 +6,7 @@ import org.stjude.sprocket.server.SprocketServerManager
 
 class SprocketStreamConnectionProvider(private val project: Project) : ProcessStreamConnectionProvider() {
 
-    init {
+    override fun start() {
         val manager = SprocketServerManager.getInstance()
         val command = manager.buildServerCommand()
 
@@ -15,5 +15,7 @@ class SprocketStreamConnectionProvider(private val project: Project) : ProcessSt
         } else {
             manager.notifyMissingBinary(project)
         }
+
+        super.start()
     }
 }

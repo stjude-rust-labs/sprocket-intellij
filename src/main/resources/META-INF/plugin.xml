@@ -25,6 +25,24 @@
     <depends>com.redhat.devtools.lsp4ij</depends>
 
     <extensions defaultExtensionNs="com.intellij">
+        <fileType
+            name="WDL"
+            implementationClass="org.stjude.sprocket.WdlFileType"
+            fieldName="INSTANCE"
+            language="WDL"
+            extensions="wdl"/>
+
+        <editorHighlighterProvider
+            filetype="WDL"
+            implementationClass="org.jetbrains.plugins.textmate.language.syntax.highlighting.TextMateEditorHighlighterProvider"/>
+
+        <lang.syntaxHighlighterFactory
+            language="WDL"
+            implementationClass="org.jetbrains.plugins.textmate.language.syntax.highlighting.TextMateSyntaxHighlighterFactory"/>
+
+        <applicationInitializedListener
+            implementation="org.stjude.sprocket.WdlTextMatePreloader"/>
+
         <applicationService
             serviceImplementation="org.stjude.sprocket.settings.SprocketSettings"/>
 
@@ -70,7 +88,7 @@
             ]]></description>
         </server>
 
-        <fileNamePatternMapping patterns="*.wdl" serverId="sprocketLanguageServer"/>
+        <languageMapping language="WDL" serverId="sprocketLanguageServer"/>
     </extensions>
 
     <actions>

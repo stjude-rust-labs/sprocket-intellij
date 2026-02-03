@@ -14,11 +14,6 @@ class SprocketSettingsTest {
     }
 
     @Test
-    fun `default checkForUpdates is true`() {
-        assertTrue(settings.checkForUpdates)
-    }
-
-    @Test
     fun `default binaryPath is empty`() {
         assertEquals("", settings.binaryPath)
     }
@@ -34,11 +29,6 @@ class SprocketSettingsTest {
     }
 
     @Test
-    fun `default maxRetries is 1`() {
-        assertEquals(1, settings.maxRetries)
-    }
-
-    @Test
     fun `getState returns this instance`() {
         assertSame(settings, settings.state)
     }
@@ -46,35 +36,27 @@ class SprocketSettingsTest {
     @Test
     fun `loadState copies all properties`() {
         val source = SprocketSettings().apply {
-            checkForUpdates = false
             binaryPath = "/custom/path/sprocket"
             outputLevel = OutputLevel.VERBOSE
             lint = true
-            maxRetries = 5
         }
 
         settings.loadState(source)
 
-        assertFalse(settings.checkForUpdates)
         assertEquals("/custom/path/sprocket", settings.binaryPath)
         assertEquals(OutputLevel.VERBOSE, settings.outputLevel)
         assertTrue(settings.lint)
-        assertEquals(5, settings.maxRetries)
     }
 
     @Test
     fun `settings properties are mutable`() {
-        settings.checkForUpdates = false
         settings.binaryPath = "/new/path"
         settings.outputLevel = OutputLevel.INFORMATION
         settings.lint = true
-        settings.maxRetries = 3
 
-        assertFalse(settings.checkForUpdates)
         assertEquals("/new/path", settings.binaryPath)
         assertEquals(OutputLevel.INFORMATION, settings.outputLevel)
         assertTrue(settings.lint)
-        assertEquals(3, settings.maxRetries)
     }
 
     @Test
@@ -97,17 +79,5 @@ class SprocketSettingsTest {
             settings.outputLevel = level
             assertEquals(level, settings.outputLevel)
         }
-    }
-
-    @Test
-    fun `maxRetries accepts zero`() {
-        settings.maxRetries = 0
-        assertEquals(0, settings.maxRetries)
-    }
-
-    @Test
-    fun `maxRetries accepts negative values`() {
-        settings.maxRetries = -1
-        assertEquals(-1, settings.maxRetries)
     }
 }

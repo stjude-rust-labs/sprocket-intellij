@@ -13,11 +13,9 @@ import com.intellij.util.xmlb.XmlSerializerUtil
     storages = [Storage("sprocket.xml")]
 )
 class SprocketSettings : PersistentStateComponent<SprocketSettings> {
-    var checkForUpdates: Boolean = true
     var binaryPath: String = ""
     var outputLevel: OutputLevel = OutputLevel.QUIET
     var lint: Boolean = false
-    var maxRetries: Int = 1
 
     override fun getState(): SprocketSettings = this
 
