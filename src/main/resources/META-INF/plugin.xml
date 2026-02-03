@@ -1,0 +1,89 @@
+<idea-plugin>
+    <id>org.stjude.sprocket</id>
+    <name>Sprocket</name>
+    <vendor email="support@stjude.org" url="https://github.com/stjude-rust-labs">
+        St. Jude Children's Research Hospital
+    </vendor>
+
+    <description><![CDATA[
+    WDL (Workflow Description Language) support powered by the Sprocket language server.
+
+    <ul>
+        <li>Syntax highlighting</li>
+        <li>Real-time diagnostics</li>
+        <li>Code completion</li>
+        <li>Hover information</li>
+        <li>Go to definition</li>
+        <li>Find references</li>
+        <li>Document formatting</li>
+        <li>Linting (optional)</li>
+    </ul>
+    ]]></description>
+
+    <depends>com.intellij.modules.platform</depends>
+    <depends>org.jetbrains.plugins.textmate</depends>
+    <depends>com.redhat.devtools.lsp4ij</depends>
+
+    <extensions defaultExtensionNs="com.intellij">
+        <applicationService
+            serviceImplementation="org.stjude.sprocket.settings.SprocketSettings"/>
+
+        <applicationConfigurable
+            parentId="tools"
+            instance="org.stjude.sprocket.settings.SprocketConfigurable"
+            id="org.stjude.sprocket.settings.SprocketConfigurable"
+            displayName="Sprocket"/>
+
+        <applicationService
+            serviceImplementation="org.stjude.sprocket.server.SprocketServerManager"/>
+
+        <statusBarWidgetFactory
+            id="SprocketStatusBar"
+            implementation="org.stjude.sprocket.ui.SprocketStatusBarWidgetFactory"/>
+
+        <postStartupActivity
+            implementation="org.stjude.sprocket.SprocketStartupActivity"/>
+
+        <notificationGroup
+            id="Sprocket"
+            displayType="BALLOON"/>
+    </extensions>
+
+    <extensions defaultExtensionNs="com.intellij.textmate">
+        <bundleProvider implementation="org.stjude.sprocket.WdlTextMateBundleProvider"/>
+    </extensions>
+
+    <extensions defaultExtensionNs="com.redhat.devtools.lsp4ij">
+        <server id="sprocketLanguageServer"
+                name="Sprocket"
+                factoryClass="org.stjude.sprocket.lsp.SprocketLanguageServerFactory">
+            <description><![CDATA[
+            <p>The Sprocket language server provides WDL (Workflow Description Language) support including:</p>
+            <ul>
+                <li>Diagnostics and validation</li>
+                <li>Code completion</li>
+                <li>Hover documentation</li>
+                <li>Go to definition</li>
+                <li>Find references</li>
+                <li>Document formatting</li>
+            </ul>
+            ]]></description>
+        </server>
+
+        <fileNamePatternMapping patterns="*.wdl" serverId="sprocketLanguageServer"/>
+    </extensions>
+
+    <actions>
+        <group id="org.stjude.sprocket.SprocketGroup" text="Sprocket" popup="true">
+            <add-to-group group-id="ToolsMenu" anchor="last"/>
+            <action id="org.stjude.sprocket.RestartServer"
+                    class="org.stjude.sprocket.ui.RestartServerAction"
+                    text="Restart Server"
+                    description="Restart the Sprocket language server"/>
+            <action id="org.stjude.sprocket.OpenSettings"
+                    class="org.stjude.sprocket.ui.OpenSettingsAction"
+                    text="Open Settings"
+                    description="Open Sprocket settings"/>
+        </group>
+    </actions>
+</idea-plugin>

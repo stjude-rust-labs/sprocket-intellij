@@ -1,0 +1,23 @@
+{
+  "name": "wdl",
+  "displayName": "WDL",
+  "version": "0.1.0",
+  "publisher": "stjude",
+  "description": "WDL (Workflow Description Language) syntax highlighting",
+  "contributes": {
+    "languages": [
+      {
+        "id": "WDL",
+        "aliases": ["WDL", "Workflow Description Language"],
+        "extensions": [".wdl"]
+      }
+    ],
+    "grammars": [
+      {
+        "language": "WDL",
+        "scopeName": "source.wdl",
+        "path": "./wdl.tmGrammar.json"
+      }
+    ]
+  }
+}
