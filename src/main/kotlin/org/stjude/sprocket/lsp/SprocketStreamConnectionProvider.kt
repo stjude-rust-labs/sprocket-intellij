@@ -1,17 +1,17 @@
 package org.stjude.sprocket.lsp
 
 import com.intellij.openapi.project.Project
-import com.redhat.devtools.lsp4ij.server.ProcessStreamConnectionProvider
+import com.redhat.devtools.lsp4ij.server.OSProcessStreamConnectionProvider
 import org.stjude.sprocket.server.SprocketServerManager
 
-class SprocketStreamConnectionProvider(private val project: Project) : ProcessStreamConnectionProvider() {
+class SprocketStreamConnectionProvider(private val project: Project) : OSProcessStreamConnectionProvider() {
 
     override fun start() {
         val manager = SprocketServerManager.getInstance()
         val command = manager.buildServerCommand()
 
         if (command != null) {
-            super.setCommands(command)
+            super.setCommandLine(command)
         } else {
             manager.notifyMissingBinary(project)
         }

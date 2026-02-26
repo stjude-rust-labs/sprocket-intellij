@@ -1,5 +1,6 @@
 package org.stjude.sprocket.server
 
+import com.intellij.execution.configurations.GeneralCommandLine
 import com.intellij.notification.NotificationGroupManager
 import com.intellij.notification.NotificationType
 import com.intellij.openapi.application.ApplicationManager
@@ -82,18 +83,18 @@ class SprocketServerManager {
             .firstOrNull { it.exists() && it.canExecute() }
     }
 
-    fun buildServerCommand(): List<String>? {
+    fun buildServerCommand(): GeneralCommandLine? {
         val binary = resolveBinary() ?: return null
 
         val settings = SprocketSettings.getInstance()
-        val command = mutableListOf(binary.absolutePath, "analyzer", "--stdio")
+        val command = GeneralCommandLine(binary.absolutePath, "analyzer", "--stdio")
 
-        settings.outputLevel.cliArg?.let { command.add(it) }
+        settings.outputLevel.cliArg?.let { command.addParameter(it) }
         if (settings.lint) {
-            command.add("--lint")
+            command.addParameter("--lint")
         }
 
-        LOG.info("Built sprocket command: `${command.joinToString(" ")}`")
+        LOG.info("Built sprocket command: `${command}`")
         return command
     }
 }
