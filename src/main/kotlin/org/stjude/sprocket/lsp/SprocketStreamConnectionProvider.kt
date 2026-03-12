@@ -8,7 +8,7 @@ class SprocketStreamConnectionProvider(private val project: Project) : OSProcess
 
     override fun start() {
         val manager = SprocketServerManager.getInstance()
-        val command = manager.buildServerCommand()
+        val command = manager.buildServerCommand(project)
 
         if (command != null) {
             super.setCommandLine(command)

@@ -52,15 +52,15 @@ class SprocketServerManager {
             .notify(project)
     }
 
-    fun resolveBinary(): File? {
-        val settings = SprocketSettings.getInstance()
+    fun resolveBinary(project: Project): File? {
+        val settings = SprocketSettings.getInstance(project)
 
-        if (settings.binaryPath.isNotBlank()) {
-            val manual = File(settings.binaryPath)
+        if (settings.binaryPath().isNotBlank()) {
+            val manual = File(settings.binaryPath())
             if (manual.exists() && manual.canExecute()) {
                 return manual
             }
-            LOG.warn("Configured binary path does not exist or is not executable: ${settings.binaryPath}")
+            LOG.warn("Configured binary path does not exist or is not executable: ${settings.binaryPath()}")
         }
 
         findInPath("sprocket")?.let { return it }
@@ -83,14 +83,14 @@ class SprocketServerManager {
             .firstOrNull { it.exists() && it.canExecute() }
     }
 
-    fun buildServerCommand(): GeneralCommandLine? {
-        val binary = resolveBinary() ?: return null
+    fun buildServerCommand(project: Project): GeneralCommandLine? {
+        val binary = resolveBinary(project) ?: return null
 
-        val settings = SprocketSettings.getInstance()
+        val settings = SprocketSettings.getInstance(project)
         val command = GeneralCommandLine(binary.absolutePath, "analyzer", "--stdio")
 
-        settings.outputLevel.cliArg?.let { command.addParameter(it) }
-        if (settings.lint) {
+        settings.outputLevel().cliArg?.let { command.addParameter(it) }
+        if (settings.lint()) {
             command.addParameter("--lint")
         }
 

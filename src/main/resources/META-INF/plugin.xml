@@ -40,20 +40,11 @@
             language="WDL"
             implementationClass="org.jetbrains.plugins.textmate.language.syntax.highlighting.TextMateSyntaxHighlighterFactory"/>
 
-        <applicationInitializedListener
-            implementation="org.stjude.sprocket.WdlTextMatePreloader"/>
-
-        <applicationService
-            serviceImplementation="org.stjude.sprocket.settings.SprocketSettings"/>
-
-        <applicationConfigurable
+        <projectConfigurable
             parentId="tools"
             instance="org.stjude.sprocket.settings.SprocketConfigurable"
             id="org.stjude.sprocket.settings.SprocketConfigurable"
             displayName="Sprocket"/>
-
-        <applicationService
-            serviceImplementation="org.stjude.sprocket.server.SprocketServerManager"/>
 
         <statusBarWidgetFactory
             id="SprocketStatusBar"
