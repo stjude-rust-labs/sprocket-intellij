@@ -38,7 +38,9 @@ class OutputLevelTest {
     @Test
     fun `entries contains all expected values`() {
         val entries = OutputLevel.entries
-        assertEquals(3, entries.size)
+        assertEquals(5, entries.size)
+        assertTrue(entries.contains(OutputLevel.TRACE))
+        assertTrue(entries.contains(OutputLevel.DEBUG))
         assertTrue(entries.contains(OutputLevel.VERBOSE))
         assertTrue(entries.contains(OutputLevel.INFORMATION))
         assertTrue(entries.contains(OutputLevel.QUIET))

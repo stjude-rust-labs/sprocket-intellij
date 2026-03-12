@@ -66,7 +66,7 @@ class SprocketSettings : PersistentStateComponent<SprocketSettings.State> {
     }
 
     data class LintOptions(
-        var enabled: Boolean = true,
+        var enabled: Boolean = false,
     ) {
         fun toLSPSettings(): JsonObject {
             val settings = JsonObject()

@@ -15,69 +15,64 @@ class SprocketSettingsTest {
 
     @Test
     fun `default binaryPath is empty`() {
-        assertEquals("", settings.binaryPath)
+        assertEquals("", settings.binaryPath())
     }
 
     @Test
     fun `default outputLevel is QUIET`() {
-        assertEquals(OutputLevel.QUIET, settings.outputLevel)
+        assertEquals(OutputLevel.QUIET, settings.outputLevel())
     }
 
     @Test
     fun `default lint is false`() {
-        assertFalse(settings.lint)
-    }
-
-    @Test
-    fun `getState returns this instance`() {
-        assertSame(settings, settings.state)
+        assertFalse(settings.lint())
     }
 
     @Test
     fun `loadState copies all properties`() {
-        val source = SprocketSettings().apply {
+        val source = SprocketSettings().state.apply {
             binaryPath = "/custom/path/sprocket"
-            outputLevel = OutputLevel.VERBOSE
-            lint = true
+            options.outputLevel = OutputLevel.VERBOSE
+            options.lintOptions.enabled = true
         }
 
         settings.loadState(source)
 
-        assertEquals("/custom/path/sprocket", settings.binaryPath)
-        assertEquals(OutputLevel.VERBOSE, settings.outputLevel)
-        assertTrue(settings.lint)
+        assertEquals("/custom/path/sprocket", settings.binaryPath())
+        assertEquals(OutputLevel.VERBOSE, settings.outputLevel())
+        assertTrue(settings.lint())
     }
 
     @Test
     fun `settings properties are mutable`() {
-        settings.binaryPath = "/new/path"
-        settings.outputLevel = OutputLevel.INFORMATION
-        settings.lint = true
+        settings.state.binaryPath = "/new/path"
+        settings.state.options.outputLevel = OutputLevel.INFORMATION
+        settings.state.options.lintOptions.enabled = true
 
-        assertEquals("/new/path", settings.binaryPath)
-        assertEquals(OutputLevel.INFORMATION, settings.outputLevel)
-        assertTrue(settings.lint)
+        assertEquals("/new/path", settings.binaryPath())
+        assertEquals(OutputLevel.INFORMATION, settings.outputLevel())
+        assertTrue(settings.lint())
     }
 
     @Test
     fun `binaryPath can be set to blank`() {
-        settings.binaryPath = "/some/path"
-        settings.binaryPath = ""
-        assertEquals("", settings.binaryPath)
+        settings.state.binaryPath = "/some/path"
+        settings.state.binaryPath = ""
+        assertEquals("", settings.binaryPath())
     }
 
     @Test
     fun `binaryPath handles paths with spaces`() {
         val pathWithSpaces = "/path/with spaces/to/sprocket"
-        settings.binaryPath = pathWithSpaces
-        assertEquals(pathWithSpaces, settings.binaryPath)
+        settings.state.binaryPath = pathWithSpaces
+        assertEquals(pathWithSpaces, settings.binaryPath())
     }
 
     @Test
     fun `outputLevel can cycle through all values`() {
         for (level in OutputLevel.entries) {
-            settings.outputLevel = level
-            assertEquals(level, settings.outputLevel)
+            settings.state.options.outputLevel = level
+            assertEquals(level, settings.state.options.outputLevel)
         }
     }
 }
