@@ -58,7 +58,7 @@ class SprocketSettings : PersistentStateComponent<SprocketSettings.State> {
         fun toLSPSettings(): JsonObject {
             val settings = JsonObject()
 
-            settings.add("log_level", JsonPrimitive(outputLevel.levelFilter))
+            settings.add("logLevel", JsonPrimitive(outputLevel.levelFilter))
             settings.add("lint",lintOptions.toLSPSettings())
 
             return settings
