@@ -20,7 +20,7 @@ class SprocketSettingsTest {
 
     @Test
     fun `default outputLevel is QUIET`() {
-        assertEquals(OutputLevel.QUIET, settings.outputLevel())
+        assertEquals(OutputLevel.ERROR, settings.outputLevel())
     }
 
     @Test
@@ -32,25 +32,25 @@ class SprocketSettingsTest {
     fun `loadState copies all properties`() {
         val source = SprocketSettings().state.apply {
             binaryPath = "/custom/path/sprocket"
-            options.outputLevel = OutputLevel.VERBOSE
+            options.outputLevel = OutputLevel.INFO
             options.lintOptions.enabled = true
         }
 
         settings.loadState(source)
 
         assertEquals("/custom/path/sprocket", settings.binaryPath())
-        assertEquals(OutputLevel.VERBOSE, settings.outputLevel())
+        assertEquals(OutputLevel.INFO, settings.outputLevel())
         assertTrue(settings.lint())
     }
 
     @Test
     fun `settings properties are mutable`() {
         settings.state.binaryPath = "/new/path"
-        settings.state.options.outputLevel = OutputLevel.INFORMATION
+        settings.state.options.outputLevel = OutputLevel.WARN
         settings.state.options.lintOptions.enabled = true
 
         assertEquals("/new/path", settings.binaryPath())
-        assertEquals(OutputLevel.INFORMATION, settings.outputLevel())
+        assertEquals(OutputLevel.WARN, settings.outputLevel())
         assertTrue(settings.lint())
     }
 

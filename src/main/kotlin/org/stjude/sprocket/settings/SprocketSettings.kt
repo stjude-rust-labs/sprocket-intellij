@@ -52,7 +52,7 @@ class SprocketSettings : PersistentStateComponent<SprocketSettings.State> {
     )
 
     data class ServerOptions(
-        var outputLevel: OutputLevel = OutputLevel.QUIET,
+        var outputLevel: OutputLevel = OutputLevel.ERROR,
         var lintOptions: LintOptions = LintOptions()
     ) {
         fun toLSPSettings(): JsonObject {
