@@ -15,6 +15,7 @@ class SprocketConfigurable(private val project: Project) : BoundConfigurable("Sp
         settings.fireStateChanged()
 
         if (settings.binaryPath() != originalSprocketBinaryPath) {
+            originalSprocketBinaryPath = settings.binaryPath()
             restartServer()
         }
     }

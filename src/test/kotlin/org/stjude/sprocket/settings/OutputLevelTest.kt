@@ -6,17 +6,19 @@ import org.junit.jupiter.api.Assertions.*
 class OutputLevelTest {
 
     @Test
-    fun `VERBOSE has correct CLI argument`() {
+    fun `Verbose levels have correct CLI arguments`() {
         assertEquals("--verbose", OutputLevel.INFO.cliArg)
+        assertEquals("--vv", OutputLevel.DEBUG.cliArg)
+        assertEquals("--vvv", OutputLevel.TRACE.cliArg)
     }
 
     @Test
-    fun `INFORMATION has null CLI argument`() {
+    fun `WARN has null CLI argument`() {
         assertNull(OutputLevel.WARN.cliArg)
     }
 
     @Test
-    fun `QUIET has correct CLI argument`() {
+    fun `ERROR has correct CLI argument`() {
         assertEquals("--quiet", OutputLevel.ERROR.cliArg)
     }
 

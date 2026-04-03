@@ -45,6 +45,6 @@ class WdlLanguageClient(project: Project) : LanguageClientImpl(project) {
 
     override fun dispose() {
         super.dispose()
-        SprocketSettings.getInstance(project).removeChangeHandler(didChangeConfigurationListener)
+        SprocketSettings.getInstance(project).removeChangeHandler(maybeDidChangeConfigurationListener)
     }
 }
