@@ -1,0 +1,278 @@
+{
+  parserClass="org.stjude.sprocket.lang.parser.WdlParser"
+
+  psiClassPrefix="Wdl"
+  psiImplClassSuffix="Impl"
+  psiPackage="org.stjude.sprocket.lang.psi"
+  psiImplPackage="org.stjude.sprocket.lang.psi.impl"
+  elementTypeHolderClass="org.stjude.sprocket.lang.psi.WdlTokenTypes"
+  elementTypeClass="org.stjude.sprocket.lang.WdlElementType"
+  tokenTypeClass="org.stjude.sprocket.lang.WdlTokenType"
+
+  methods("struct|enum|workflow|task|declaration|call_alias|output_declaration|scatter_declaration")=[getName getNameIdentifier setName]
+  methods("callable_lookup")=[getName getNameIdentifier setName getReferences]
+  implements("command_content_text")="com.intellij.psi.PsiLanguageInjectionHost"
+  mixin("command_content_text")="org.stjude.sprocket.ide.psi.WdlCommandStringImpl"
+  extends(".*_expr")=expression
+}
+
+wdlFile ::= (version_statement)? items
+
+// == RECOVERY UTILS ==
+private item_start ::= KW_IMPORT | KW_STRUCT | KW_ENUM | KW_WORKFLOW | KW_TASK
+private type_start ::= OBJECT_TYPE | PRIMITIVE_TYPE | MAP_TYPE | ARRAY_TYPE | PAIR_TYPE | IDENTIFIER
+private section_start ::= KW_INPUT | KW_OUTPUT | KW_META | KW_PARAMETER_META | KW_HINTS | KW_RUNTIME | KW_REQUIREMENTS
+private statement_start ::= KW_CALL | KW_IF | KW_SCATTER | type_start
+
+// == VERSION ==
+version_statement ::= KW_VERSION FLOAT { pin=1 }
+
+// == ITEMS ==
+item ::= import_stmt | struct | enum | workflow | task
+
+private recoverable_item ::= !(R_BRACE | <<eof>>) item {
+    pin=1
+    recoverWhile=item_recovery
+}
+private item_recovery ::= !(R_BRACE | item_start)
+private items ::= recoverable_item*
+
+// == IMPORTS ==
+import_stmt ::= KW_IMPORT import_tree { pin=1 }
+import_tree ::=
+    single_line_string_literal import_namespace? import_alias*
+    // v1.4+
+    | import_module
+    | L_BRACE <<comma_separated_list import_member>> R_BRACE KW_FROM import_module
+    | ASTERISK KW_FROM import_module
+import_member ::= IDENTIFIER (KW_AS IDENTIFIER)?
+import_module ::= import_module_path import_namespace?
+import_module_path ::=
+    single_line_string_literal
+    | IDENTIFIER (SLASH IDENTIFIER)*
+import_namespace ::= KW_AS IDENTIFIER
+import_alias ::= KW_ALIAS IDENTIFIER KW_AS IDENTIFIER
+
+// == STRUCTS ==
+struct ::= KW_STRUCT IDENTIFIER L_BRACE recoverable_struct_entry* R_BRACE { pin=1 }
+struct_entry ::= struct_member | meta_section | parameter_meta_section
+struct_member ::= type IDENTIFIER
+
+private recoverable_struct_entry ::= !(R_BRACE) struct_entry {
+    pin=1
+    recoverWhile=struct_entry_recover
+}
+private struct_entry_recover ::= !(R_BRACE | type_start | KW_META | KW_PARAMETER_META)
+
+// == ENUMS ==
+enum ::= KW_ENUM IDENTIFIER (enum_type)? L_BRACE enum_choice R_BRACE { pin=1 }
+enum_type ::= L_SQUARE type R_SQUARE
+enum_choice ::= <<comma_separated_list (IDENTIFIER (EQUAL expression)?)>>
+
+// == WORKFLOWS ==
+workflow ::= KW_WORKFLOW IDENTIFIER L_BRACE recoverable_workflow_body_element* R_BRACE { pin=1 }
+workflow_input_section ::= KW_INPUT L_BRACE recoverable_declaration* R_BRACE
+workflow_section ::= workflow_input_section | output_section | meta_section | parameter_meta_section | hints_section
+workflow_statement ::= call_statement | declaration | if_statement | scatter_statement
+workflow_body_element ::= workflow_section | workflow_statement
+
+private recoverable_workflow_body_element ::= !(R_BRACE) workflow_body_element {
+    pin=1
+    recoverWhile=body_element_recover
+}
+private body_element_recover ::= !(R_BRACE | item_start | section_start | statement_start)
+
+// == OUTPUT SECTION ==
+output_section ::= KW_OUTPUT L_BRACE output_section_body R_BRACE
+output_section_body ::= recoverable_output_declaration*
+output_declaration ::= type IDENTIFIER EQUAL expression
+
+private recoverable_output_declaration ::= !(R_BRACE) output_declaration {
+    pin=1
+    recoverWhile=declaration_recover
+}
+
+// == META SECTION ==
+meta_section ::= KW_META L_BRACE recoverable_meta_entry* R_BRACE
+meta_entry ::= IDENTIFIER COLON meta_value
+meta_value ::= string_literal | meta_integer_value | meta_float_value | BOOLEAN | NULL | meta_object_value | meta_array_value
+meta_integer_value ::= (DASH)? integer_value
+meta_float_value ::= (DASH)? float_value
+meta_object_value ::= L_BRACE <<comma_separated_list meta_entry>> R_BRACE
+meta_array_value ::= L_SQUARE <<comma_separated_list meta_value>> R_SQUARE
+
+// == PARAMETER META SECTION ==
+parameter_meta_section ::= KW_PARAMETER_META L_BRACE meta_entry* R_BRACE
+
+private recoverable_meta_entry ::= !(R_BRACE) meta_entry {
+    pin=1
+    recoverWhile=kv_recover
+}
+
+call_statement ::= KW_CALL callable_lookup call_alias? call_after* call_inputs_block? { pin=1 }
+callable_lookup ::= fully_qualified_name
+call_alias ::= KW_AS IDENTIFIER
+call_after ::= KW_AFTER IDENTIFIER
+call_inputs_block ::= L_BRACE call_inputs? R_BRACE
+call_inputs ::= (KW_INPUT COLON)? <<comma_separated_list call_input>>
+call_input ::= IDENTIFIER (EQUAL expression)?
+
+workflow_block ::= L_BRACE workflow_statement* R_BRACE
+
+if_statement ::= KW_IF condition workflow_block else_clause*
+condition ::= L_PAREN expression R_PAREN
+else_clause ::= KW_ELSE (KW_IF condition)? workflow_block
+
+scatter_statement ::= KW_SCATTER L_PAREN IDENTIFIER KW_IN expression R_PAREN workflow_block { pin=1 }
+
+// == TASK ==
+task ::= KW_TASK IDENTIFIER L_BRACE recoverable_task_body_element* R_BRACE { pin=1 }
+task_input_section ::= KW_INPUT L_BRACE recoverable_task_declaration* R_BRACE
+task_section ::= task_input_section | output_section | meta_section | parameter_meta_section | runtime_section | requirements_section | hints_section
+task_declaration ::= KW_ENV? declaration
+task_body_element ::= task_section | task_declaration | command_block
+
+private recoverable_task_body_element ::= !(R_BRACE) task_body_element {
+    pin=1
+    recoverWhile=task_body_element_recover
+}
+private task_body_element_recover ::= !(R_BRACE | item_start | section_start | statement_start | KW_COMMAND | KW_ENV)
+
+private recoverable_task_declaration ::= !(R_BRACE) task_declaration {
+    pin=1
+    recoverWhile=task_declaration_recover
+}
+private task_declaration_recover ::= !(R_BRACE | type_start | KW_ENV)
+
+command_block ::= KW_COMMAND (curly_command_block|heredoc_command_block)
+curly_command_block ::= L_BRACE command_content R_BRACE { pin=1 }
+heredoc_command_block ::= HEREDOC_OPEN command_content HEREDOC_CLOSE { pin=1 }
+command_content ::= (command_content_text|placeholder)*
+// Only exists to add the mixin
+command_content_text ::= COMMAND_TEXT
+
+// == HINTS SECTION ==
+hints_section ::= KW_HINTS L_BRACE recoverable_hints_entry* R_BRACE
+hints_entry ::= IDENTIFIER COLON hints_entry_value
+hints_entry_value ::= hints_declaration_entry | expression
+hints_declaration_entry ::= (KW_INPUT | KW_OUTPUT) L_BRACE (IDENTIFIER COLON hints_section)* R_BRACE
+
+private recoverable_hints_entry ::= !(R_BRACE) hints_entry {
+    pin=1
+    recoverWhile=kv_recover
+}
+
+// == RUNTIME SECTION ==
+runtime_section ::= KW_RUNTIME L_BRACE recoverable_kv* R_BRACE
+
+// == REQUIREMENTS SECTION ==
+requirements_section ::= KW_REQUIREMENTS L_BRACE recoverable_kv* R_BRACE
+
+// == DECLARATIONS ==
+declaration ::= type IDENTIFIER setter?
+setter ::= EQUAL expression
+
+private recoverable_declaration ::= !(R_BRACE) declaration {
+    pin=1
+    recoverWhile=declaration_recover
+}
+private declaration_recover ::= !(R_BRACE | type_start)
+
+kv ::= IDENTIFIER COLON expression
+
+private recoverable_kv ::= !(R_BRACE) kv {
+    pin=1
+    recoverWhile=kv_recover
+}
+private kv_recover ::= !(R_BRACE | IDENTIFIER)
+
+// == TYPES ==
+type ::= type_name QMARK*
+type_name ::= OBJECT_TYPE | PRIMITIVE_TYPE | map_expression | array_expression | pair_expression | IDENTIFIER
+array_expression ::= ARRAY_TYPE L_SQUARE type R_SQUARE PLUS?
+map_expression ::= MAP_TYPE L_SQUARE type COMMA type R_SQUARE
+pair_expression ::= PAIR_TYPE L_SQUARE type COMMA type R_SQUARE
+
+// == STRINGS ==
+string_literal ::= single_line_string_literal | multiline_string_literal
+string_part ::=
+      STRING_CONTENT
+    | ESCAPE_SEQUENCE
+    | placeholder
+single_line_string_literal ::=
+      QUOTE_DOUBLE string_part* QUOTE_DOUBLE
+    | QUOTE_SINGLE string_part* QUOTE_SINGLE
+multiline_string_literal ::= HEREDOC_OPEN string_part* HEREDOC_CLOSE
+
+// == PLACEHOLDERS ==
+placeholder ::= PLACEHOLDER_OPEN placeholder_option* expression PLACEHOLDER_CLOSE
+placeholder_option ::= placeholder_option_type expression
+placeholder_option_type ::=
+    PLACEHOLDER_OPTION_SEP
+    | PLACEHOLDER_OPTION_DEFAULT
+    | PLACEHOLDER_OPTION_TRUE
+    | PLACEHOLDER_OPTION_FALSE
+
+// == EXPRESSIONS ==
+expression ::=
+    logical_or_expr
+  | logical_and_expr
+  | equality_expr
+  | relational_expr
+  | add_expr
+  | mul_expr
+  | pow_expr
+  | div_expr
+  | mod_expr
+  | unary_expr
+  | member_access_expr
+  | primary_group
+
+logical_or_expr ::= expression DOUBLE_PIPE expression
+logical_and_expr ::= expression DOUBLE_AMPERSAND expression
+equality_expr ::= expression (DOUBLE_EQUAL | NOT_EQUAL) expression
+relational_expr ::= expression (LESS_THAN | LESS_EQUAL | MORE_THAN | MORE_EQUAL) expression
+add_expr ::= expression (PLUS | DASH) expression
+mul_expr ::= expression ASTERISK expression
+pow_expr ::= expression DOUBLE_ASTERISK expression
+div_expr ::= expression SLASH expression
+mod_expr ::= expression PERCENT expression
+
+unary_expr ::= (LOGICAL_NOT | PLUS | DASH) expression
+
+member_access_expr ::= expression (L_SQUARE expression R_SQUARE | DOT (IDENTIFIER | KW_LEFT | KW_RIGHT))
+
+private primary_group ::=
+    if_expr
+  | function_call_expr
+  | object_literal_expr
+  | struct_literal_expr
+  | map_literal_expr
+  | array_literal_expr
+  | value_expr
+  | pair_expr
+  | paren_expr
+
+if_expr ::= KW_IF expression KW_THEN expression KW_ELSE expression
+function_call_expr ::= IDENTIFIER L_PAREN <<comma_separated_list expression>> R_PAREN
+object_literal_expr ::= KW_OBJECT L_BRACE <<comma_separated_list object_kv>> R_BRACE
+struct_literal_expr ::= IDENTIFIER L_BRACE <<comma_separated_list object_kv>> R_BRACE
+map_literal_expr ::= L_BRACE <<comma_separated_list map_kv>> R_BRACE
+array_literal_expr ::= L_SQUARE <<comma_separated_list expression>> R_SQUARE
+value_expr ::= string_literal | value_lookup | BOOLEAN | float_value | integer_value | NONE
+pair_expr ::= L_PAREN expression COMMA expression R_PAREN
+paren_expr ::= L_PAREN expression R_PAREN
+
+map_kv ::= expression COLON expression
+object_kv ::= IDENTIFIER COLON expression
+// `KW_TASK` is also a valid variable name
+value_lookup ::= (IDENTIFIER | KW_TASK | KW_META | KW_PARAMETER_META | KW_HINTS) {methods=[getReferences]}
+float_value ::= FLOAT
+integer_value ::= NUMBER
+
+fully_qualified_name ::= IDENTIFIER (DOT IDENTIFIER)*
+
+meta comma_separated_list ::= ( <<p>> (COMMA <<p>>)* COMMA? )?
+
+// Not actually used, needed for Grammar Kit to generate the variants
+private comments ::= COMMENT | DOC_COMMENT

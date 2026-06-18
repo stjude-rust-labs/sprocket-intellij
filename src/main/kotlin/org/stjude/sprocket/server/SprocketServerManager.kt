@@ -95,11 +95,4 @@ class SprocketServerManager {
             .map { File(it, name) }
             .firstOrNull { it.exists() && it.canExecute() }
     }
-
-    fun buildServerCommand(project: Project): GeneralCommandLine? {
-        val binary = resolveBinary(project) ?: return null
-
-        val settings = SprocketSettings.getInstance(project)
-        return buildCommand(binary, settings.outputLevel(), settings.lint())
-    }
 }

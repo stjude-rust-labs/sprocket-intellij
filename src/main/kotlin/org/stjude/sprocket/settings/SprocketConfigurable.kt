@@ -46,5 +46,9 @@ class SprocketConfigurable(private val project: Project) : BoundConfigurable("Sp
             checkBox("Enable lint checks")
                 .bindSelected(settings.state.options.lintOptions::enabled)
         }
+        row {
+            checkBox("Enable formatting")
+                .bindSelected(settings.state::format)
+        }
     }
 }

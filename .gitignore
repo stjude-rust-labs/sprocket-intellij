@@ -17,3 +17,6 @@ Thumbs.db
 # IntelliJ Platform cache
 .intellijPlatform/
 
+# Generated code
+src/main/gen/
+

@@ -30,6 +30,8 @@ class SprocketSettings : PersistentStateComponent<SprocketSettings.State> {
 
     fun lint(): Boolean = this.state.options.lintOptions.enabled
 
+    fun format(): Boolean = this.state.format
+
     fun addChangeHandler(runnable: Runnable) = changeHandlers.add(runnable)
 
     fun removeChangeHandler(runnable: Runnable) = changeHandlers.remove(runnable)
@@ -48,6 +50,7 @@ class SprocketSettings : PersistentStateComponent<SprocketSettings.State> {
 
     data class State(
         var binaryPath: String = "",
+        var format: Boolean = false,
         var options: ServerOptions = ServerOptions()
     )
 

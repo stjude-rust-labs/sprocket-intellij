@@ -4,8 +4,9 @@ fun properties(key: String) = project.findProperty(key).toString()
 
 plugins {
     id("java")
-    id("org.jetbrains.kotlin.jvm") version "2.0.21"
-    id("org.jetbrains.intellij.platform") version "2.11.0"
+    id("org.jetbrains.kotlin.jvm") version "2.3.20"
+    id("org.jetbrains.intellij.platform") version "2.14.0"
+    id("org.jetbrains.grammarkit") version "2023.3.0.3"
 }
 
 group = providers.gradleProperty("pluginGroup").get()
@@ -22,6 +23,7 @@ dependencies {
     intellijPlatform {
         intellijIdeaCommunity(providers.gradleProperty("platformVersion"))
         bundledPlugin("org.jetbrains.plugins.textmate")
+        bundledPlugin("com.jetbrains.sh")
         plugin("com.redhat.devtools.lsp4ij:0.19.1")
         pluginVerifier()
         zipSigner()
@@ -30,6 +32,21 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter:5.11.4")
     testImplementation("io.mockk:mockk:1.13.16")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+}
+
+grammarKit {
+    tasks.register<org.jetbrains.grammarkit.tasks.GenerateLexerTask>("generateWdlLexer") {
+        sourceFile.set(file("src/main/kotlin/org/stjude/sprocket/lang/WDL.flex"))
+        targetOutputDir.set(file("src/main/gen/org/stjude/sprocket/lang"))
+    }
+
+    tasks.register<org.jetbrains.grammarkit.tasks.GenerateParserTask>("generateWdlParser") {
+        dependsOn("generateWdlLexer")
+        sourceFile.set(file("src/main/kotlin/org/stjude/sprocket/lang/WDL.bnf"))
+        targetRootOutputDir.set(file("src/main/gen"))
+        pathToParser.set("org/stjude/sprocket/lang/parser")
+        pathToPsiRoot.set("org/stjude/sprocket/lang/psi")
+    }
 }
 
 kotlin {
@@ -50,6 +67,9 @@ intellijPlatform {
         }
     }
 }
+
+sourceSets["main"].java.srcDirs("src/main/gen")
+sourceSets["main"].kotlin.srcDirs("src/main/gen")
 
 val grammarUrl = "https://raw.githubusercontent.com/stjude-rust-labs/sprocket-vscode/main/syntaxes/wdl.tmGrammar.json"
 val generatedSyntaxesDir = layout.buildDirectory.dir("generated/syntaxes")
@@ -96,6 +116,14 @@ tasks {
 
     processResources {
         dependsOn(updateGrammar)
+    }
+
+    withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
+        dependsOn("generateWdlParser")
+    }
+
+    compileJava {
+        dependsOn("generateWdlParser")
     }
 
     test {
