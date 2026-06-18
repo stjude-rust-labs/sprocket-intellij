@@ -8,8 +8,8 @@ class OutputLevelTest {
     @Test
     fun `Verbose levels have correct CLI arguments`() {
         assertEquals("--verbose", OutputLevel.INFO.cliArg)
-        assertEquals("--vv", OutputLevel.DEBUG.cliArg)
-        assertEquals("--vvv", OutputLevel.TRACE.cliArg)
+        assertEquals("-vv", OutputLevel.DEBUG.cliArg)
+        assertEquals("-vvv", OutputLevel.TRACE.cliArg)
     }
 
     @Test
