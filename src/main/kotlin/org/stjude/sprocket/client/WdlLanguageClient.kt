@@ -16,7 +16,7 @@ class WdlLanguageClient(project: Project) : LanguageClientImpl(project) {
             didChangeConfigurationListener.run()
         }
     }
-    
+
     init {
         SprocketSettings.getInstance(project).addChangeHandler(maybeDidChangeConfigurationListener)
     }
