@@ -16,7 +16,7 @@ class CommandBuilderTest {
     }
 
     @Test
-    fun `buildCommand includes verbose flag when output level is VERBOSE`() {
+    fun `buildCommand includes verbose flag when output level is INFO`() {
         val binary = File("/usr/local/bin/sprocket")
         val command = buildCommand(binary, OutputLevel.INFO, lint = false)
 
@@ -25,7 +25,7 @@ class CommandBuilderTest {
     }
 
     @Test
-    fun `buildCommand includes quiet flag when output level is QUIET`() {
+    fun `buildCommand includes quiet flag when output level is ERROR`() {
         val binary = File("/usr/local/bin/sprocket")
         val command = buildCommand(binary, OutputLevel.ERROR, lint = false)
 
@@ -34,7 +34,7 @@ class CommandBuilderTest {
     }
 
     @Test
-    fun `buildCommand does not include output flag when level is INFORMATION`() {
+    fun `buildCommand does not include output flag when level is WARN`() {
         val binary = File("/usr/local/bin/sprocket")
         val command = buildCommand(binary, OutputLevel.WARN, lint = false)
 
@@ -99,12 +99,6 @@ class CommandBuilderTest {
             "Command should use absolute path")
     }
 
-    private fun buildCommand(binary: File, outputLevel: OutputLevel, lint: Boolean): List<String> {
-        val command = mutableListOf(binary.absolutePath, "analyzer", "--stdio")
-        outputLevel.cliArg?.let { command.add(it) }
-        if (lint) {
-            command.add("--lint")
-        }
-        return command
-    }
+    private fun buildCommand(binary: File, outputLevel: OutputLevel, lint: Boolean): List<String> =
+        SprocketServerManager.buildCommand(binary, outputLevel, lint).getCommandLineList(null)
 }
