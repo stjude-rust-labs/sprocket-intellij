@@ -19,7 +19,7 @@ class SprocketSettingsTest {
     }
 
     @Test
-    fun `default outputLevel is QUIET`() {
+    fun `default outputLevel is ERROR`() {
         assertEquals(OutputLevel.ERROR, settings.outputLevel())
     }
 
@@ -72,7 +72,7 @@ class SprocketSettingsTest {
     fun `outputLevel can cycle through all values`() {
         for (level in OutputLevel.entries) {
             settings.state.options.outputLevel = level
-            assertEquals(level, settings.state.options.outputLevel)
+            assertEquals(level, settings.outputLevel())
         }
     }
 }
