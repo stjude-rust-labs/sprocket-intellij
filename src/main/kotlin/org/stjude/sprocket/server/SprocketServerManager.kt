@@ -1,5 +1,6 @@
 package org.stjude.sprocket.server
 
+import com.intellij.execution.configurations.GeneralCommandLine
 import com.intellij.notification.NotificationGroupManager
 import com.intellij.notification.NotificationType
 import com.intellij.openapi.application.ApplicationManager
@@ -7,6 +8,7 @@ import com.intellij.openapi.components.Service
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.project.Project
 import com.intellij.util.EnvironmentUtil
+import org.stjude.sprocket.settings.OutputLevel
 import org.stjude.sprocket.settings.SprocketSettings
 import java.io.File
 
@@ -35,6 +37,18 @@ class SprocketServerManager {
 
         fun getInstance(): SprocketServerManager =
             ApplicationManager.getApplication().getService(SprocketServerManager::class.java)
+
+        fun buildCommand(binary: File, outputLevel: OutputLevel, lint: Boolean): GeneralCommandLine {
+            val command = GeneralCommandLine(binary.absolutePath, "analyzer", "--stdio")
+
+            outputLevel.cliArg?.let { command.addParameter(it) }
+            if (lint) {
+                command.addParameter("--lint")
+            }
+
+            LOG.info("Built sprocket command: `${command}`")
+            return command
+        }
     }
 
     fun notifyMissingBinary(project: Project) {
@@ -51,15 +65,15 @@ class SprocketServerManager {
             .notify(project)
     }
 
-    fun resolveBinary(): File? {
-        val settings = SprocketSettings.getInstance()
+    fun resolveBinary(project: Project): File? {
+        val settings = SprocketSettings.getInstance(project)
 
-        if (settings.binaryPath.isNotBlank()) {
-            val manual = File(settings.binaryPath)
+        if (settings.binaryPath().isNotBlank()) {
+            val manual = File(settings.binaryPath())
             if (manual.exists() && manual.canExecute()) {
                 return manual
             }
-            LOG.warn("Configured binary path does not exist or is not executable: ${settings.binaryPath}")
+            LOG.warn("Configured binary path does not exist or is not executable: ${settings.binaryPath()}")
         }
 
         findInPath("sprocket")?.let { return it }
@@ -82,18 +96,10 @@ class SprocketServerManager {
             .firstOrNull { it.exists() && it.canExecute() }
     }
 
-    fun buildServerCommand(): List<String>? {
-        val binary = resolveBinary() ?: return null
+    fun buildServerCommand(project: Project): GeneralCommandLine? {
+        val binary = resolveBinary(project) ?: return null
 
-        val settings = SprocketSettings.getInstance()
-        val command = mutableListOf(binary.absolutePath, "analyzer", "--stdio")
-
-        settings.outputLevel.cliArg?.let { command.add(it) }
-        if (settings.lint) {
-            command.add("--lint")
-        }
-
-        LOG.info("Built sprocket command: `${command.joinToString(" ")}`")
-        return command
+        val settings = SprocketSettings.getInstance(project)
+        return buildCommand(binary, settings.outputLevel(), settings.lint())
     }
 }

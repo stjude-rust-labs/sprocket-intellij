@@ -1,5 +1,7 @@
 import java.net.URI
 
+fun properties(key: String) = project.findProperty(key).toString()
+
 plugins {
     id("java")
     id("org.jetbrains.kotlin.jvm") version "2.0.21"
@@ -35,6 +37,13 @@ kotlin {
 }
 
 intellijPlatform {
+    pluginConfiguration {
+        ideaVersion {
+            sinceBuild = provider { properties("pluginSinceBuild") }
+            untilBuild = provider { properties("pluginUntilBuild") }
+        }
+    }
+
     pluginVerification {
         ides {
             recommended()
@@ -94,8 +103,8 @@ tasks {
     }
 
     patchPluginXml {
-        sinceBuild.set("242")
-        untilBuild.set("253.*")
+        sinceBuild.set(properties("pluginSinceBuild"))
+        untilBuild.set(properties("pluginUntilBuild"))
     }
 
     signPlugin {

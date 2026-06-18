@@ -10,33 +10,33 @@ class CommandBuilderTest {
     @Test
     fun `buildCommand creates basic command with analyzer and stdio`() {
         val binary = File("/usr/local/bin/sprocket")
-        val command = buildCommand(binary, OutputLevel.INFORMATION, lint = false)
+        val command = buildCommand(binary, OutputLevel.WARN, lint = false)
 
         assertEquals(listOf("/usr/local/bin/sprocket", "analyzer", "--stdio"), command)
     }
 
     @Test
-    fun `buildCommand includes verbose flag when output level is VERBOSE`() {
+    fun `buildCommand includes verbose flag when output level is INFO`() {
         val binary = File("/usr/local/bin/sprocket")
-        val command = buildCommand(binary, OutputLevel.VERBOSE, lint = false)
+        val command = buildCommand(binary, OutputLevel.INFO, lint = false)
 
         assertTrue(command.contains("--verbose"))
         assertEquals(listOf("/usr/local/bin/sprocket", "analyzer", "--stdio", "--verbose"), command)
     }
 
     @Test
-    fun `buildCommand includes quiet flag when output level is QUIET`() {
+    fun `buildCommand includes quiet flag when output level is ERROR`() {
         val binary = File("/usr/local/bin/sprocket")
-        val command = buildCommand(binary, OutputLevel.QUIET, lint = false)
+        val command = buildCommand(binary, OutputLevel.ERROR, lint = false)
 
         assertTrue(command.contains("--quiet"))
         assertEquals(listOf("/usr/local/bin/sprocket", "analyzer", "--stdio", "--quiet"), command)
     }
 
     @Test
-    fun `buildCommand does not include output flag when level is INFORMATION`() {
+    fun `buildCommand does not include output flag when level is WARN`() {
         val binary = File("/usr/local/bin/sprocket")
-        val command = buildCommand(binary, OutputLevel.INFORMATION, lint = false)
+        val command = buildCommand(binary, OutputLevel.WARN, lint = false)
 
         assertFalse(command.contains("--verbose"))
         assertFalse(command.contains("--quiet"))
@@ -45,7 +45,7 @@ class CommandBuilderTest {
     @Test
     fun `buildCommand includes lint flag when lint is enabled`() {
         val binary = File("/usr/local/bin/sprocket")
-        val command = buildCommand(binary, OutputLevel.INFORMATION, lint = true)
+        val command = buildCommand(binary, OutputLevel.WARN, lint = true)
 
         assertTrue(command.contains("--lint"))
     }
@@ -53,7 +53,7 @@ class CommandBuilderTest {
     @Test
     fun `buildCommand does not include lint flag when lint is disabled`() {
         val binary = File("/usr/local/bin/sprocket")
-        val command = buildCommand(binary, OutputLevel.INFORMATION, lint = false)
+        val command = buildCommand(binary, OutputLevel.WARN, lint = false)
 
         assertFalse(command.contains("--lint"))
     }
@@ -61,7 +61,7 @@ class CommandBuilderTest {
     @Test
     fun `buildCommand includes both output level and lint flags`() {
         val binary = File("/usr/local/bin/sprocket")
-        val command = buildCommand(binary, OutputLevel.VERBOSE, lint = true)
+        val command = buildCommand(binary, OutputLevel.INFO, lint = true)
 
         assertEquals(
             listOf("/usr/local/bin/sprocket", "analyzer", "--stdio", "--verbose", "--lint"),
@@ -72,7 +72,7 @@ class CommandBuilderTest {
     @Test
     fun `buildCommand preserves flag order`() {
         val binary = File("/path/to/sprocket")
-        val command = buildCommand(binary, OutputLevel.QUIET, lint = true)
+        val command = buildCommand(binary, OutputLevel.ERROR, lint = true)
 
         val stdioIndex = command.indexOf("--stdio")
         val quietIndex = command.indexOf("--quiet")
@@ -85,7 +85,7 @@ class CommandBuilderTest {
     @Test
     fun `buildCommand handles paths with spaces`() {
         val binary = File("/path/with spaces/sprocket")
-        val command = buildCommand(binary, OutputLevel.INFORMATION, lint = false)
+        val command = buildCommand(binary, OutputLevel.WARN, lint = false)
 
         assertEquals("/path/with spaces/sprocket", command[0])
     }
@@ -93,18 +93,12 @@ class CommandBuilderTest {
     @Test
     fun `buildCommand uses absolute path`() {
         val binary = File("relative/path/sprocket")
-        val command = buildCommand(binary, OutputLevel.INFORMATION, lint = false)
+        val command = buildCommand(binary, OutputLevel.WARN, lint = false)
 
         assertTrue(command[0].startsWith("/") || command[0].contains(":"),
             "Command should use absolute path")
     }
 
-    private fun buildCommand(binary: File, outputLevel: OutputLevel, lint: Boolean): List<String> {
-        val command = mutableListOf(binary.absolutePath, "analyzer", "--stdio")
-        outputLevel.cliArg?.let { command.add(it) }
-        if (lint) {
-            command.add("--lint")
-        }
-        return command
-    }
+    private fun buildCommand(binary: File, outputLevel: OutputLevel, lint: Boolean): List<String> =
+        SprocketServerManager.buildCommand(binary, outputLevel, lint).getCommandLineList(null)
 }

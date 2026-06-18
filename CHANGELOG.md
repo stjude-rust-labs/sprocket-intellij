@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+* LSP server logs now appear in the IDE console ([#1](https://github.com/claymcleod/sprocket-intellij/pull/1)).
+* Output levels expanded to Trace, Debug, Info, Warn, and Error ([#1](https://github.com/claymcleod/sprocket-intellij/pull/1)).
+
+### Changed
+
+* Sprocket settings are now project-scoped instead of application-wide ([#1](https://github.com/claymcleod/sprocket-intellij/pull/1)).
+* Configuration changes apply to the running server immediately; the server only restarts when the binary path changes ([#1](https://github.com/claymcleod/sprocket-intellij/pull/1)).
+* Raised the supported IDE build range to `261.*` ([#1](https://github.com/claymcleod/sprocket-intellij/pull/1)).
+
 ## [0.1.1] - 2026-02-03
 
 ### Fixed

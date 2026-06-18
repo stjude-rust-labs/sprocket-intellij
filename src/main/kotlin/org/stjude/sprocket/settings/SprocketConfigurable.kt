@@ -2,48 +2,49 @@ package org.stjude.sprocket.settings
 
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory
 import com.intellij.openapi.options.BoundConfigurable
-import com.intellij.openapi.project.ProjectManager
-import com.intellij.ui.dsl.builder.AlignX
-import com.intellij.ui.dsl.builder.bindItem
-import com.intellij.ui.dsl.builder.bindSelected
-import com.intellij.ui.dsl.builder.bindText
-import com.intellij.ui.dsl.builder.panel
-import com.intellij.ui.dsl.builder.toNullableProperty
+import com.intellij.openapi.project.Project
+import com.intellij.ui.dsl.builder.*
 import com.redhat.devtools.lsp4ij.LanguageServerManager
 
-class SprocketConfigurable : BoundConfigurable("Sprocket") {
-    private val settings = SprocketSettings.getInstance()
+class SprocketConfigurable(private val project: Project) : BoundConfigurable("Sprocket") {
+    private val settings get() = SprocketSettings.getInstance(project)
+    private var originalSprocketBinaryPath: String = settings.binaryPath()
 
     override fun apply() {
         super.apply()
-        for (project in ProjectManager.getInstance().openProjects) {
-            try {
-                LanguageServerManager.getInstance(project).stop("sprocketLanguageServer")
-                LanguageServerManager.getInstance(project).start("sprocketLanguageServer")
-            } catch (e: Exception) {
-                // Server restart failed, but don't crash
-            }
+        settings.fireStateChanged()
+
+        if (settings.binaryPath() != originalSprocketBinaryPath) {
+            originalSprocketBinaryPath = settings.binaryPath()
+            restartServer()
         }
+    }
+
+    private fun restartServer() {
+        val stopOptions = LanguageServerManager.StopOptions()
+        stopOptions.isWillDisable = false
+        LanguageServerManager.getInstance(project).stop("sprocketLanguageServer", stopOptions)
+        LanguageServerManager.getInstance(project).start("sprocketLanguageServer")
     }
 
     override fun createPanel() = panel {
         row("Sprocket binary path:") {
             textFieldWithBrowseButton(
                 "Select Sprocket Binary",
-                null,
+                project,
                 FileChooserDescriptorFactory.createSingleFileDescriptor()
             )
                 .align(AlignX.FILL)
-                .bindText(settings::binaryPath)
+                .bindText(settings.state::binaryPath)
                 .comment("Leave empty to use PATH lookup")
         }
         row("Output level:") {
             comboBox(OutputLevel.entries)
-                .bindItem(settings::outputLevel.toNullableProperty())
+                .bindItem(settings.state.options::outputLevel.toNullableProperty())
         }
         row {
             checkBox("Enable lint checks")
-                .bindSelected(settings::lint)
+                .bindSelected(settings.state.options.lintOptions::enabled)
         }
     }
 }
