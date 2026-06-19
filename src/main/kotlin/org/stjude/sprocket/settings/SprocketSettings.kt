@@ -50,7 +50,7 @@ class SprocketSettings : PersistentStateComponent<SprocketSettings.State> {
 
     data class State(
         var binaryPath: String = "",
-        var format: Boolean = false,
+        var format: Boolean = true,
         var options: ServerOptions = ServerOptions()
     )
 
