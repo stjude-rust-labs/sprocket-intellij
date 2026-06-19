@@ -1,43 +1,51 @@
 package org.stjude.sprocket.lang
 
-import com.intellij.lexer.Lexer
-import com.intellij.testFramework.LexerTestCase
+import com.intellij.psi.tree.IElementType
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertNull
+import org.junit.jupiter.api.Test
+import org.stjude.sprocket.lang.psi.WdlTokenTypes
 
-class WdlLexerTest : LexerTestCase() {
-    override fun createLexer(): Lexer {
-        return WdlLexerAdapter()
+class WdlLexerTest {
+
+    @Test
+    fun `keywords lex to a single keyword token`() {
+        assertSingleToken("alias", WdlTokenTypes.KW_ALIAS)
+        assertSingleToken("as", WdlTokenTypes.KW_AS)
+        assertSingleToken("call", WdlTokenTypes.KW_CALL)
+        assertSingleToken("command", WdlTokenTypes.KW_COMMAND)
+        assertSingleToken("else", WdlTokenTypes.KW_ELSE)
+        assertSingleToken("enum", WdlTokenTypes.KW_ENUM)
+        assertSingleToken("hints", WdlTokenTypes.KW_HINTS)
+        assertSingleToken("if", WdlTokenTypes.KW_IF)
+        assertSingleToken("in", WdlTokenTypes.KW_IN)
+        assertSingleToken("import", WdlTokenTypes.KW_IMPORT)
+        assertSingleToken("input", WdlTokenTypes.KW_INPUT)
+        assertSingleToken("left", WdlTokenTypes.KW_LEFT)
+        assertSingleToken("meta", WdlTokenTypes.KW_META)
+        assertSingleToken("object", WdlTokenTypes.KW_OBJECT)
+        assertSingleToken("output", WdlTokenTypes.KW_OUTPUT)
+        assertSingleToken("parameter_meta", WdlTokenTypes.KW_PARAMETER_META)
+        assertSingleToken("right", WdlTokenTypes.KW_RIGHT)
+        assertSingleToken("requirements", WdlTokenTypes.KW_REQUIREMENTS)
+        assertSingleToken("runtime", WdlTokenTypes.KW_RUNTIME)
+        assertSingleToken("scatter", WdlTokenTypes.KW_SCATTER)
+        assertSingleToken("struct", WdlTokenTypes.KW_STRUCT)
+        assertSingleToken("task", WdlTokenTypes.KW_TASK)
+        assertSingleToken("then", WdlTokenTypes.KW_THEN)
+        assertSingleToken("version", WdlTokenTypes.KW_VERSION)
+        assertSingleToken("workflow", WdlTokenTypes.KW_WORKFLOW)
+        assertSingleToken("env", WdlTokenTypes.KW_ENV)
     }
 
-    override fun getDirPath(): String {
-        return ""
-    }
+    private fun assertSingleToken(text: String, expected: IElementType) {
+        val lexer = WdlLexerAdapter()
+        lexer.start(text, 0, text.length, 0)
 
-    fun testKeywords() {
-        doTest("alias", "WdlTokenTypes.KW_ALIAS ('alias')")
-        doTest("as", "WdlTokenTypes.KW_AS ('as')")
-        doTest("call", "WdlTokenTypes.KW_CALL ('call')")
-        doTest("command", "WdlTokenTypes.KW_COMMAND ('command')")
-        doTest("else", "WdlTokenTypes.KW_ELSE ('else')")
-        doTest("enum", "WdlTokenTypes.KW_ENUM ('enum')")
-        doTest("hints", "WdlTokenTypes.KW_HINTS ('hints')")
-        doTest("if", "WdlTokenTypes.KW_IF ('if')")
-        doTest("in", "WdlTokenTypes.KW_IN ('in')")
-        doTest("import", "WdlTokenTypes.KW_IMPORT ('import')")
-        doTest("input", "WdlTokenTypes.KW_INPUT ('input')")
-        doTest("left", "WdlTokenTypes.KW_LEFT ('left')")
-        doTest("meta", "WdlTokenTypes.KW_META ('meta')")
-        doTest("object", "WdlTokenTypes.KW_OBJECT ('object')")
-        doTest("output", "WdlTokenTypes.KW_OUTPUT ('output')")
-        doTest("parameter_meta", "WdlTokenTypes.KW_PARAMETER_META ('parameter_meta')")
-        doTest("right", "WdlTokenTypes.KW_RIGHT ('right')")
-        doTest("requirements", "WdlTokenTypes.KW_REQUIREMENTS ('requirements')")
-        doTest("runtime", "WdlTokenTypes.KW_RUNTIME ('runtime')")
-        doTest("scatter", "WdlTokenTypes.KW_SCATTER ('scatter')")
-        doTest("struct", "WdlTokenTypes.KW_STRUCT ('struct')")
-        doTest("task", "WdlTokenTypes.KW_TASK ('task')")
-        doTest("then", "WdlTokenTypes.KW_THEN ('then')")
-        doTest("version", "WdlTokenTypes.KW_VERSION ('version')")
-        doTest("workflow", "WdlTokenTypes.KW_WORKFLOW ('workflow')")
-        doTest("env", "WdlTokenTypes.KW_ENV ('env')")
+        assertEquals(expected, lexer.tokenType, "token type for `$text`")
+        assertEquals(text, lexer.tokenText, "token text for `$text`")
+
+        lexer.advance()
+        assertNull(lexer.tokenType, "`$text` should lex to a single token")
     }
 }
