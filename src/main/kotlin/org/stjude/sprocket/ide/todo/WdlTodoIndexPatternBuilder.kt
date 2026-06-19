@@ -16,8 +16,8 @@ class WdlTodoIndexPatternBuilder : IndexPatternBuilder {
 
     override fun getCommentStartDelta(tokenType: IElementType?): Int {
         return when (tokenType) {
-            in WdlTokenSets.LINE_COMMENTS -> 2
-            in WdlTokenSets.DOC_COMMENTS -> 3
+            in WdlTokenSets.LINE_COMMENTS -> 1
+            in WdlTokenSets.DOC_COMMENTS -> 2
             else -> 0
         }
     }
