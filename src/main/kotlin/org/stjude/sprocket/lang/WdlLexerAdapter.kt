@@ -13,7 +13,7 @@ class WdlLexerAdapter : FlexAdapter(WdlLexer(null)) {
             buffer,
             startOffset,
             endOffset,
-            initialState and 0xF
+            initialState and 0x1F
         )
     }
 }
