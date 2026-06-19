@@ -32,6 +32,10 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter:5.11.4")
     testImplementation("io.mockk:mockk:1.13.16")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+    // `WdlParserTest` extends the platform's JUnit 3 `ParsingTestCase`; the vintage
+    // engine lets `useJUnitPlatform()` discover and run it.
+    testImplementation("junit:junit:4.13.2")
+    testRuntimeOnly("org.junit.vintage:junit-vintage-engine:5.11.4")
 }
 
 grammarKit {
@@ -128,6 +132,9 @@ tasks {
 
     test {
         useJUnitPlatform()
+        // `ParsingTestCase` boots and disposes a platform `Application`; isolate each test
+        // class in its own JVM so that lifecycle doesn't leak into the plain unit tests.
+        setForkEvery(1)
     }
 
     patchPluginXml {

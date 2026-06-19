@@ -5,5 +5,5 @@ import com.intellij.testFramework.ParsingTestCase
 class WdlParserTest : ParsingTestCase("parser", "wdl", WdlParserDefinition()) {
     override fun getTestDataPath() = System.getProperty("user.dir") + "/src/test/assets"
 
-    fun testFunctionDefinition() = doTest(true)
+    fun testStruct() = doTest(true)
 }
