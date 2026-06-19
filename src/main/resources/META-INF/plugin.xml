@@ -21,7 +21,6 @@
     ]]></description>
 
     <depends>com.intellij.modules.platform</depends>
-    <depends>org.jetbrains.plugins.textmate</depends>
     <depends>com.redhat.devtools.lsp4ij</depends>
     <depends>com.jetbrains.sh</depends>
 
@@ -116,10 +115,6 @@
                 language="WDL"
                 order="first"
                 implementationClass="com.redhat.devtools.lsp4ij.features.documentSymbol.LSPDocumentSymbolStructureViewFactory"/>
-    </extensions>
-
-    <extensions defaultExtensionNs="com.intellij.textmate">
-        <bundleProvider implementation="org.stjude.sprocket.WdlTextMateBundleProvider"/>
     </extensions>
 
     <extensions defaultExtensionNs="com.redhat.devtools.lsp4ij">

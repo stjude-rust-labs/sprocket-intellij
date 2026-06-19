@@ -1,5 +1,3 @@
-import java.net.URI
-
 fun properties(key: String) = project.findProperty(key).toString()
 
 plugins {
@@ -22,7 +20,6 @@ repositories {
 dependencies {
     intellijPlatform {
         intellijIdeaCommunity(providers.gradleProperty("platformVersion"))
-        bundledPlugin("org.jetbrains.plugins.textmate")
         bundledPlugin("com.jetbrains.sh")
         plugin("com.redhat.devtools.lsp4ij:0.19.1")
         pluginVerifier()
@@ -75,53 +72,7 @@ intellijPlatform {
 sourceSets["main"].java.srcDirs("src/main/gen")
 sourceSets["main"].kotlin.srcDirs("src/main/gen")
 
-val grammarUrl = "https://raw.githubusercontent.com/stjude-rust-labs/sprocket-vscode/main/syntaxes/wdl.tmGrammar.json"
-val generatedSyntaxesDir = layout.buildDirectory.dir("generated/syntaxes")
-
 tasks {
-    val updateGrammar by registering {
-        group = "build"
-        description = "Downloads the latest WDL TextMate grammar from sprocket-vscode"
-        outputs.dir(generatedSyntaxesDir)
-
-        doLast {
-            val dir = generatedSyntaxesDir.get().asFile
-            dir.mkdirs()
-            val grammarFile = File(dir, "wdl.tmGrammar.json")
-            URI(grammarUrl).toURL().openStream().use { input ->
-                grammarFile.outputStream().use { output ->
-                    input.copyTo(output)
-                }
-            }
-            println("Downloaded grammar: ${grammarFile.absolutePath}")
-        }
-    }
-
-    prepareSandbox {
-        dependsOn(updateGrammar)
-        from(generatedSyntaxesDir) {
-            into("${project.name}/syntaxes")
-        }
-        from("src/main/resources/syntaxes/package.json") {
-            into("${project.name}/syntaxes")
-        }
-    }
-
-    buildPlugin {
-        dependsOn(updateGrammar)
-        duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-        from(generatedSyntaxesDir) {
-            into("syntaxes")
-        }
-        from("src/main/resources/syntaxes/package.json") {
-            into("syntaxes")
-        }
-    }
-
-    processResources {
-        dependsOn(updateGrammar)
-    }
-
     withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
         dependsOn("generateWdlParser")
     }
