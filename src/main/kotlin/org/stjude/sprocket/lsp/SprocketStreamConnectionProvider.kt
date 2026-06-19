@@ -8,7 +8,7 @@ import org.stjude.sprocket.server.SprocketServerManager
 
 class SprocketStreamConnectionProvider(private val project: Project) : OSProcessStreamConnectionProvider() {
     companion object {
-        private val LOG = Logger.getInstance(SprocketServerManager::class.java)
+        private val LOG = Logger.getInstance(SprocketStreamConnectionProvider::class.java)
     }
 
     override fun start() {
