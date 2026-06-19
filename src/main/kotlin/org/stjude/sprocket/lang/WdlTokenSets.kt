@@ -71,7 +71,11 @@ object WdlTokenSets {
     val BRACKETS = TokenSet.orSet(OPEN_BRACKETS, CLOSE_BRACKETS)
 
     val PARENS = TokenSet.create(WdlTokenTypes.L_PAREN, WdlTokenTypes.R_PAREN)
-    val STRINGS = TokenSet.create(WdlTokenTypes.STRING_LITERAL)
+    val STRINGS = TokenSet.create(
+        WdlTokenTypes.QUOTE_DOUBLE,
+        WdlTokenTypes.QUOTE_SINGLE,
+        WdlTokenTypes.STRING_CONTENT,
+    )
     val LINE_COMMENTS = TokenSet.create(WdlTokenTypes.COMMENT)
     val DOC_COMMENTS = TokenSet.create(WdlTokenTypes.DOC_COMMENT)
     val COMMENTS = TokenSet.orSet(LINE_COMMENTS, DOC_COMMENTS)
