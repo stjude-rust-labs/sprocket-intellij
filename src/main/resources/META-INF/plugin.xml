@@ -24,6 +24,28 @@
     <depends>com.redhat.devtools.lsp4ij</depends>
     <depends>com.jetbrains.sh</depends>
     <depends>com.intellij.modules.json</depends>
+    <depends>org.jetbrains.plugins.yaml</depends>
+
+    <actions>
+        <action
+            id="sprocket.testTarget"
+            class="org.stjude.sprocket.client.SprocketLSPCommandAction"
+            text="Run `sprocket dev test`"
+            description="Runs `sprocket dev test` on the specified target"
+        />
+        <action
+            id="sprocket.testSingle"
+            class="org.stjude.sprocket.client.SprocketLSPCommandAction"
+            text="Run `sprocket dev test`"
+            description="Runs `sprocket dev test` on a single test"
+        />
+        <action
+            id="sprocket.run"
+            class="org.stjude.sprocket.client.SprocketLSPCommandAction"
+            text="Run `sprocket run`"
+            description="Runs `sprocket run` on the specified target"
+        />
+    </actions>
 
     <extensions defaultExtensionNs="com.intellij">
         <fileType
@@ -44,11 +66,20 @@
                 implementation="org.stjude.sprocket.ui.SprocketStatusBarWidgetFactory"/>
 
         <postStartupActivity
-                implementation="org.stjude.sprocket.SprocketStartupActivity"/>
+                implementation="org.stjude.sprocket.ide.activity.SprocketStartupActivity"/>
 
         <notificationGroup
                 id="Sprocket"
                 displayType="BALLOON"/>
+
+        <!-- Run configurations -->
+        <configurationType implementation="org.stjude.sprocket.ide.execution.run.SprocketRunConfigurationType"/>
+        <runConfigurationProducer
+                implementation="org.stjude.sprocket.ide.execution.run.SprocketRunRunConfigurationProducer"/>
+
+        <configurationType implementation="org.stjude.sprocket.ide.execution.test.SprocketTestConfigurationType"/>
+        <runConfigurationProducer
+                implementation="org.stjude.sprocket.ide.execution.test.SprocketTestRunConfigurationProducer"/>
 
         <!-- Tests -->
         <testSourcesFilter implementation="org.stjude.sprocket.ide.sources.SprocketTestSourcesFilter"/>
@@ -144,6 +175,9 @@
         </server>
 
         <languageMapping language="WDL" serverId="sprocketLanguageServer"/>
+        <fileNamePatternMapping patterns="*.yml;*.yaml"
+                                serverId="sprocketLanguageServer"
+                                languageId="YAML"/>
     </extensions>
 
     <actions>

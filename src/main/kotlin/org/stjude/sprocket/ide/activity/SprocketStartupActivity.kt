@@ -1,4 +1,4 @@
-package org.stjude.sprocket
+package org.stjude.sprocket.ide.activity
 
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.startup.ProjectActivity
