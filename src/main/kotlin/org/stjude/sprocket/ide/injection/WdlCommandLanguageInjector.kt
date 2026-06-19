@@ -18,36 +18,39 @@ class WdlCommandLanguageInjector : MultiHostInjector {
     override fun getLanguagesToInject(registrar: MultiHostRegistrar, host: PsiElement) {
         if (host !is WdlCommandBlock) return
 
-        var inPlaceholder = false
-        var hasStartedInjection = false
+        val children =
+            PsiTreeUtil.findChildrenOfAnyType(host, WdlCommandContentText::class.java, WdlPlaceholder::class.java)
+                .toList()
+        val lastContentIndex = children.indexOfLast { it is WdlCommandContentText }
+        if (lastContentIndex < 0) return
 
-        val elements = PsiTreeUtil.findChildrenOfAnyType(host, WdlCommandContentText::class.java, WdlPlaceholder::class.java)
-        for (child in elements) {
+        registrar.startInjecting(ShLanguage.INSTANCE)
+
+        // `sh` can't see the WDL placeholders (`~{...}`/`${...}`), so stand each one in with a
+        // `dummy` token to keep the surrounding shell syntax intact. Placeholders between content
+        // fragments become a prefix on the next fragment; any trailing the last fragment become a
+        // suffix on it.
+        var pendingPlaceholders = 0
+        children.forEachIndexed { index, child ->
             when (child) {
+                is WdlPlaceholder -> pendingPlaceholders++
                 is WdlCommandContentText -> {
-                    if (!hasStartedInjection) {
-                        registrar.startInjecting(ShLanguage.INSTANCE)
-                        hasStartedInjection = true
+                    val prefix = if (pendingPlaceholders > 0) "dummy".repeat(pendingPlaceholders) else null
+                    pendingPlaceholders = 0
+
+                    val suffix = if (index == lastContentIndex) {
+                        val trailing = children.drop(index + 1).count { it is WdlPlaceholder }
+                        if (trailing > 0) "dummy".repeat(trailing) else null
+                    } else {
+                        null
                     }
 
-                    registrar.addPlace(
-                        // Have to add some dummy text in place of placeholders so that the `sh`
-                        // plugin doesn't get tripped up on the gaps
-                        if (inPlaceholder) "dummy" else null,
-                        null,
-                        child,
-                        TextRange(0, child.textLength)
-                    )
-
-                    inPlaceholder = false
+                    registrar.addPlace(prefix, suffix, child, TextRange(0, child.textLength))
                 }
-                is WdlPlaceholder -> inPlaceholder = true
             }
         }
 
-        if (hasStartedInjection) {
-            registrar.doneInjecting()
-        }
+        registrar.doneInjecting()
     }
 
     override fun elementsToInjectIn(): List<Class<out PsiElement>> {
