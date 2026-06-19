@@ -35,7 +35,7 @@ class WdlHighlightingAnnotator : Annotator {
             WdlTokenTypes.DECLARATION,
             WdlTokenTypes.OUTPUT_DECLARATION,
             WdlTokenTypes.TASK_DECLARATION,
-            WdlTokenTypes.HINTS_ENTRY-> WdlSyntaxHighlighter.DECLARATION
+            WdlTokenTypes.HINTS_ENTRY -> WdlSyntaxHighlighter.DECLARATION
             WdlTokenTypes.META_ENTRY -> {
                 // Need to iterate through all the parents since `META_OBJECT_VALUE` and `META_ARRAY_VALUE`
                 // can appear within both `META_SECTION` and `PARAMETER_META_SECTION`
