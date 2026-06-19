@@ -1,6 +1,5 @@
 package org.stjude.sprocket.server
 
-import com.intellij.execution.configurations.GeneralCommandLine
 import com.intellij.notification.NotificationGroupManager
 import com.intellij.notification.NotificationType
 import com.intellij.openapi.application.ApplicationManager
@@ -8,7 +7,6 @@ import com.intellij.openapi.components.Service
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.project.Project
 import com.intellij.util.EnvironmentUtil
-import org.stjude.sprocket.settings.OutputLevel
 import org.stjude.sprocket.settings.SprocketSettings
 import java.io.File
 
@@ -37,18 +35,6 @@ class SprocketServerManager {
 
         fun getInstance(): SprocketServerManager =
             ApplicationManager.getApplication().getService(SprocketServerManager::class.java)
-
-        fun buildCommand(binary: File, outputLevel: OutputLevel, lint: Boolean): GeneralCommandLine {
-            val command = GeneralCommandLine(binary.absolutePath, "analyzer", "--stdio")
-
-            outputLevel.cliArg?.let { command.addParameter(it) }
-            if (lint) {
-                command.addParameter("--lint")
-            }
-
-            LOG.info("Built sprocket command: `${command}`")
-            return command
-        }
     }
 
     fun notifyMissingBinary(project: Project) {
