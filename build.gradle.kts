@@ -20,7 +20,7 @@ repositories {
 dependencies {
     intellijPlatform {
         intellijIdeaCommunity(providers.gradleProperty("platformVersion"))
-        bundledPlugin("com.jetbrains.sh")
+        bundledPlugins(listOf("com.jetbrains.sh", "com.intellij.modules.json"))
         plugin("com.redhat.devtools.lsp4ij:0.19.1")
         pluginVerifier()
         zipSigner()
