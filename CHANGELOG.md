@@ -16,7 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 * Sprocket settings are now project-scoped instead of application-wide ([#1](https://github.com/claymcleod/sprocket-intellij/pull/1)).
 * Configuration changes apply to the running server immediately; the server only restarts when the binary path changes ([#1](https://github.com/claymcleod/sprocket-intellij/pull/1)).
-* Raised the supported IDE build range to `261.*` ([#1](https://github.com/claymcleod/sprocket-intellij/pull/1)).
+* Raised the supported IDE build range to `262.*` ([#3](https://github.com/claymcleod/sprocket-intellij/pull/3)).
 
 ## [0.1.1] - 2026-02-03
 
