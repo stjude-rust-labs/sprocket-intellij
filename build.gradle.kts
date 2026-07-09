@@ -102,4 +102,10 @@ tasks {
     publishPlugin {
         token.set(System.getenv("PUBLISH_TOKEN"))
     }
+
+    wrapper {
+        gradleVersion = "9.4.1"
+        distributionSha256Sum = "708d2c6ecc97ca9a11838ef64a6c2301151b8dd10387e22dc1a12c30557cab5b"
+        distributionType = Wrapper.DistributionType.ALL
+    }
 }
