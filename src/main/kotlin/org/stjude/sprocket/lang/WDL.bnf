@@ -102,7 +102,7 @@ meta_object_value ::= L_BRACE <<comma_separated_list meta_entry>> R_BRACE
 meta_array_value ::= L_SQUARE <<comma_separated_list meta_value>> R_SQUARE
 
 // == PARAMETER META SECTION ==
-parameter_meta_section ::= KW_PARAMETER_META L_BRACE meta_entry* R_BRACE
+parameter_meta_section ::= KW_PARAMETER_META L_BRACE recoverable_meta_entry* R_BRACE
 
 private recoverable_meta_entry ::= !(R_BRACE) meta_entry {
     pin=1
@@ -187,7 +187,7 @@ private recoverable_kv ::= !(R_BRACE) kv {
 private kv_recover ::= !(R_BRACE | IDENTIFIER)
 
 // == TYPES ==
-type ::= type_name QMARK*
+type ::= type_name QMARK?
 type_name ::= OBJECT_TYPE | PRIMITIVE_TYPE | map_expression | array_expression | pair_expression | IDENTIFIER
 array_expression ::= ARRAY_TYPE L_SQUARE type R_SQUARE PLUS?
 map_expression ::= MAP_TYPE L_SQUARE type COMMA type R_SQUARE

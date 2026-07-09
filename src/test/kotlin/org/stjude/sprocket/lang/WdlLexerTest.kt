@@ -1,5 +1,6 @@
 package org.stjude.sprocket.lang
 
+import com.intellij.psi.TokenType
 import com.intellij.psi.tree.IElementType
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNull
@@ -38,6 +39,49 @@ class WdlLexerTest {
         assertSingleToken("env", WdlTokenTypes.KW_ENV)
     }
 
+    @Test
+    fun `all numeric literal forms are supported`() {
+        assertSingleToken("1234", WdlTokenTypes.NUMBER)
+        assertSingleToken("0xC4FEBABE", WdlTokenTypes.NUMBER)
+        assertSingleToken("0xC4FEbabe", WdlTokenTypes.NUMBER)
+        assertSingleToken("0o777", WdlTokenTypes.NUMBER)
+        assertSingleToken("1.0", WdlTokenTypes.FLOAT)
+        assertSingleToken("1.", WdlTokenTypes.FLOAT)
+        assertSingleToken(".1", WdlTokenTypes.FLOAT)
+        assertSingleToken("1e10", WdlTokenTypes.FLOAT)
+        assertSingleToken("1E10", WdlTokenTypes.FLOAT)
+        assertSingleToken("1e+10", WdlTokenTypes.FLOAT)
+        assertSingleToken("1e-10", WdlTokenTypes.FLOAT)
+    }
+
+    @Test
+    fun `placeholders balance braces`() {
+        assertTokenTypes(
+            "command <<<~{write_json({\"x\": {\"y\": y}})}>>>",
+            WdlTokenTypes.KW_COMMAND,
+            WdlTokenTypes.HEREDOC_OPEN,
+                WdlTokenTypes.PLACEHOLDER_OPEN,
+                    WdlTokenTypes.IDENTIFIER,
+                    WdlTokenTypes.L_PAREN,
+                        WdlTokenTypes.L_BRACE,
+                            WdlTokenTypes.QUOTE_DOUBLE,
+                            WdlTokenTypes.STRING_CONTENT,
+                            WdlTokenTypes.QUOTE_DOUBLE,
+                            WdlTokenTypes.COLON,
+                            WdlTokenTypes.L_BRACE,
+                                WdlTokenTypes.QUOTE_DOUBLE,
+                                WdlTokenTypes.STRING_CONTENT,
+                                WdlTokenTypes.QUOTE_DOUBLE,
+                                WdlTokenTypes.COLON,
+                                WdlTokenTypes.IDENTIFIER,
+                            WdlTokenTypes.R_BRACE,
+                        WdlTokenTypes.R_BRACE,
+                    WdlTokenTypes.R_PAREN,
+                WdlTokenTypes.PLACEHOLDER_CLOSE,
+            WdlTokenTypes.HEREDOC_CLOSE,
+        )
+    }
+
     private fun assertSingleToken(text: String, expected: IElementType) {
         val lexer = WdlLexerAdapter()
         lexer.start(text, 0, text.length, 0)
@@ -47,5 +91,21 @@ class WdlLexerTest {
 
         lexer.advance()
         assertNull(lexer.tokenType, "`$text` should lex to a single token")
+    }
+
+    private fun assertTokenTypes(text: String, vararg expected: IElementType) {
+        val lexer = WdlLexerAdapter()
+        lexer.start(text, 0, text.length, 0)
+
+        val actual = mutableListOf<IElementType>()
+        while (lexer.tokenType != null) {
+            if (lexer.tokenType != TokenType.WHITE_SPACE) {
+                actual.add(lexer.tokenType!!)
+            }
+
+            lexer.advance()
+        }
+
+        assertEquals(expected.toList(), actual, "token types for `$text`")
     }
 }

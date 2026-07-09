@@ -33,12 +33,14 @@ object WdlTokenSets {
             WdlTokenTypes.KW_RIGHT,
             WdlTokenTypes.KW_IN,
             WdlTokenTypes.KW_COMMAND,
-            WdlTokenTypes.KW_OBJECT
+            WdlTokenTypes.KW_OBJECT,
+            WdlTokenTypes.KW_FROM,
         ),
     )
     val OPERATORS = TokenSet.create(
         WdlTokenTypes.COLON,
         WdlTokenTypes.DOUBLE_EQUAL,
+        WdlTokenTypes.DOUBLE_ASTERISK,
         WdlTokenTypes.NOT_EQUAL,
         WdlTokenTypes.EQUAL,
         WdlTokenTypes.DOT,

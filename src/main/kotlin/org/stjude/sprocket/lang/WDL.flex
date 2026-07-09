@@ -14,6 +14,7 @@ import static org.stjude.sprocket.lang.psi.WdlTokenTypes.*;
 %type IElementType
 %{
     private int stateStack = 0;
+    private int placeholderBraceDepth = 0;
 
     public void yypushState(int newState) {
         stateStack = (stateStack << 5) | yystate();
@@ -24,6 +25,20 @@ import static org.stjude.sprocket.lang.psi.WdlTokenTypes.*;
         int prevState = stateStack & 0x1F;
         stateStack >>>= 5;
         yybegin(prevState);
+    }
+
+    /**
+    * Determines the appropriate token type when encountering a closing brace
+    * in a placeholder.
+    */
+    public IElementType placeholderCloseBrace() {
+        if (placeholderBraceDepth == 0) {
+            yypopState();
+            return PLACEHOLDER_CLOSE;
+        }
+
+        placeholderBraceDepth -= 1;
+        return R_BRACE;
     }
 
     public int getPackedState() {
@@ -92,8 +107,14 @@ STRING_TYPE="String"
 NONE="None"
 NULL="null"
 BOOLEAN="true"|"false"
-NUMBER=[:digit:]+
-FLOAT=[:digit:]+\.[:digit:]+
+DIGIT=[:digit:]
+DECIMAL_INTEGER={DIGIT}+
+OCTAL_INTEGER=0[oO][0-7]+|0[0-7]+
+HEX_INTEGER=0[xX][{DIGIT}|[a-fA-F]]+
+NUMBER={DECIMAL_INTEGER}|{HEX_INTEGER}|{OCTAL_INTEGER}
+EXPONENT=[eE][+-]?[0-9]+
+FLOAT = ({DECIMAL_INTEGER}"."{DIGIT}*|"."{DECIMAL_INTEGER})({EXPONENT})?
+      | {DECIMAL_INTEGER}{EXPONENT}
 
 // Placeholders
 PLACEHOLDER_OPEN_TILDE=\~\{
@@ -156,8 +177,8 @@ IDENTIFIER=[:letter:]([:letter:]|[:digit:]|\_)*
 
 // String literals
 <D_QUOTE, S_QUOTE, MULTILINE_STRING> {ESCAPE_SEQUENCE}    { return ESCAPE_SEQUENCE; }
-<D_QUOTE> [^\"]                         { return STRING_CONTENT; }
-<S_QUOTE> [^\']                         { return STRING_CONTENT; }
+<D_QUOTE> [^[\"\n]]                         { return STRING_CONTENT; }
+<S_QUOTE> [^[\'\n]]                         { return STRING_CONTENT; }
 <MULTILINE_STRING> [^<]                 { return STRING_CONTENT; }
 <YYINITIAL, PLACEHOLDER> {QUOTE_DOUBLE} { yypushState(D_QUOTE); return QUOTE_DOUBLE; }
 <D_QUOTE>   {QUOTE_DOUBLE}              { yypopState(); return QUOTE_DOUBLE; }
@@ -167,10 +188,11 @@ IDENTIFIER=[:letter:]([:letter:]|[:digit:]|\_)*
 <MULTILINE_STRING>   {HEREDOC_CLOSE}     { yypopState(); return HEREDOC_CLOSE; }
 
 // Placeholders
-<D_QUOTE, S_QUOTE, BRACE_COMMAND, HEREDOC_COMMAND> {PLACEHOLDER_OPEN_TILDE} { yypushState(PLACEHOLDER); return PLACEHOLDER_OPEN; }
-<D_QUOTE, S_QUOTE, BRACE_COMMAND> {PLACEHOLDER_OPEN_DOLLAR}                 { yypushState(PLACEHOLDER); return PLACEHOLDER_OPEN; }
+<MULTILINE_STRING, D_QUOTE, S_QUOTE, BRACE_COMMAND, HEREDOC_COMMAND> {PLACEHOLDER_OPEN_TILDE} { yypushState(PLACEHOLDER); return PLACEHOLDER_OPEN; }
+<MULTILINE_STRING, D_QUOTE, S_QUOTE, BRACE_COMMAND> {PLACEHOLDER_OPEN_DOLLAR}                 { yypushState(PLACEHOLDER); return PLACEHOLDER_OPEN; }
 <PLACEHOLDER> {
-    {R_BRACE}                    { yypopState(); return PLACEHOLDER_CLOSE; }
+    {L_BRACE}                    { placeholderBraceDepth++; return L_BRACE; }
+    {R_BRACE}                    { return placeholderCloseBrace(); }
     {PLACEHOLDER_DEFAULT}        { return PLACEHOLDER_OPTION_DEFAULT; }
     {PLACEHOLDER_SEP}            { return PLACEHOLDER_OPTION_SEP; }
     {PLACEHOLDER_TRUE}           { return PLACEHOLDER_OPTION_TRUE; }
