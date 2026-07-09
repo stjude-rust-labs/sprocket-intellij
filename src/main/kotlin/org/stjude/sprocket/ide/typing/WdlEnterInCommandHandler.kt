@@ -77,9 +77,12 @@ class WdlEnterInCommandHandler : EnterHandlerDelegateAdapter() {
         val baseIndent = text.substring(lineStartOffset, indentEnd)
 
         // Get the indent size from code style settings
-        val indentSize = CodeStyle.getSettings(file).getIndentSize(file.fileType)
-        val indentChar = if (CodeStyle.getSettings(file).useTabCharacter(file.fileType)) "\t" else " "
-        val indentString = indentChar.repeat(indentSize)
+        val codeStyleSettings = CodeStyle.getSettings(file)
+        val indentString = if (codeStyleSettings.useTabCharacter(file.fileType)) {
+            "\t"
+        } else {
+            " ".repeat(codeStyleSettings.getIndentSize(file.fileType))
+        }
 
         val startReplaceOffset = leftElement.textRange.endOffset
         val endReplaceOffset = rightElement.textRange.startOffset

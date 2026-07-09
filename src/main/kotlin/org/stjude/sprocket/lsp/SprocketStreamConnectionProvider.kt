@@ -18,10 +18,9 @@ class SprocketStreamConnectionProvider(private val project: Project) : OSProcess
         if (command != null) {
             LOG.info("Starting sprocket server with command: `${command}`")
             super.setCommandLine(command)
+            super.start()
         } else {
             manager.notifyMissingBinary(project)
         }
-
-        super.start()
     }
 }
