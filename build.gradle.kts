@@ -1,5 +1,7 @@
 fun properties(key: String) = project.findProperty(key).toString()
 
+val grammarKitGeneratedDir = layout.buildDirectory.dir("generated/grammarKit")
+
 plugins {
     id("java")
     id("org.jetbrains.kotlin.jvm") version "2.3.20"
@@ -38,13 +40,13 @@ dependencies {
 grammarKit {
     tasks.register<org.jetbrains.grammarkit.tasks.GenerateLexerTask>("generateWdlLexer") {
         sourceFile.set(file("src/main/kotlin/org/stjude/sprocket/lang/WDL.flex"))
-        targetOutputDir.set(file("src/main/gen/org/stjude/sprocket/lang"))
+        targetOutputDir.set(grammarKitGeneratedDir.map { it.dir("org/stjude/sprocket/lang") })
     }
 
     tasks.register<org.jetbrains.grammarkit.tasks.GenerateParserTask>("generateWdlParser") {
         dependsOn("generateWdlLexer")
         sourceFile.set(file("src/main/kotlin/org/stjude/sprocket/lang/WDL.bnf"))
-        targetRootOutputDir.set(file("src/main/gen"))
+        targetRootOutputDir.set(grammarKitGeneratedDir)
         pathToParser.set("org/stjude/sprocket/lang/parser")
         pathToPsiRoot.set("org/stjude/sprocket/lang/psi")
     }
@@ -69,8 +71,8 @@ intellijPlatform {
     }
 }
 
-sourceSets["main"].java.srcDirs("src/main/gen")
-sourceSets["main"].kotlin.srcDirs("src/main/gen")
+sourceSets["main"].java.srcDir(grammarKitGeneratedDir)
+sourceSets["main"].kotlin.srcDir(grammarKitGeneratedDir)
 
 tasks {
     withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
