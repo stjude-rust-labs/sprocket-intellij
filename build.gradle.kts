@@ -1,11 +1,12 @@
-import java.net.URI
-
 fun properties(key: String) = project.findProperty(key).toString()
+
+val grammarKitGeneratedDir = layout.buildDirectory.dir("generated/grammarKit")
 
 plugins {
     id("java")
-    id("org.jetbrains.kotlin.jvm") version "2.0.21"
-    id("org.jetbrains.intellij.platform") version "2.11.0"
+    id("org.jetbrains.kotlin.jvm") version "2.3.20"
+    id("org.jetbrains.intellij.platform") version "2.14.0"
+    id("org.jetbrains.grammarkit") version "2023.3.0.3"
 }
 
 group = providers.gradleProperty("pluginGroup").get()
@@ -21,7 +22,7 @@ repositories {
 dependencies {
     intellijPlatform {
         intellijIdeaCommunity(providers.gradleProperty("platformVersion"))
-        bundledPlugin("org.jetbrains.plugins.textmate")
+        bundledPlugin("com.jetbrains.sh")
         plugin("com.redhat.devtools.lsp4ij:0.19.1")
         pluginVerifier()
         zipSigner()
@@ -30,6 +31,25 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter:5.11.4")
     testImplementation("io.mockk:mockk:1.13.16")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+    // `WdlParserTest` extends the platform's JUnit 3 `ParsingTestCase`; the vintage
+    // engine lets `useJUnitPlatform()` discover and run it.
+    testImplementation("junit:junit:4.13.2")
+    testRuntimeOnly("org.junit.vintage:junit-vintage-engine:5.11.4")
+}
+
+grammarKit {
+    tasks.register<org.jetbrains.grammarkit.tasks.GenerateLexerTask>("generateWdlLexer") {
+        sourceFile.set(file("src/main/kotlin/org/stjude/sprocket/lang/WDL.flex"))
+        targetOutputDir.set(grammarKitGeneratedDir.map { it.dir("org/stjude/sprocket/lang") })
+    }
+
+    tasks.register<org.jetbrains.grammarkit.tasks.GenerateParserTask>("generateWdlParser") {
+        dependsOn("generateWdlLexer")
+        sourceFile.set(file("src/main/kotlin/org/stjude/sprocket/lang/WDL.bnf"))
+        targetRootOutputDir.set(grammarKitGeneratedDir)
+        pathToParser.set("org/stjude/sprocket/lang/parser")
+        pathToPsiRoot.set("org/stjude/sprocket/lang/psi")
+    }
 }
 
 kotlin {
@@ -51,55 +71,23 @@ intellijPlatform {
     }
 }
 
-val grammarUrl = "https://raw.githubusercontent.com/stjude-rust-labs/sprocket-vscode/main/syntaxes/wdl.tmGrammar.json"
-val generatedSyntaxesDir = layout.buildDirectory.dir("generated/syntaxes")
+sourceSets["main"].java.srcDir(grammarKitGeneratedDir)
+sourceSets["main"].kotlin.srcDir(grammarKitGeneratedDir)
 
 tasks {
-    val updateGrammar by registering {
-        group = "build"
-        description = "Downloads the latest WDL TextMate grammar from sprocket-vscode"
-        outputs.dir(generatedSyntaxesDir)
-
-        doLast {
-            val dir = generatedSyntaxesDir.get().asFile
-            dir.mkdirs()
-            val grammarFile = File(dir, "wdl.tmGrammar.json")
-            URI(grammarUrl).toURL().openStream().use { input ->
-                grammarFile.outputStream().use { output ->
-                    input.copyTo(output)
-                }
-            }
-            println("Downloaded grammar: ${grammarFile.absolutePath}")
-        }
+    withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
+        dependsOn("generateWdlParser")
     }
 
-    prepareSandbox {
-        dependsOn(updateGrammar)
-        from(generatedSyntaxesDir) {
-            into("${project.name}/syntaxes")
-        }
-        from("src/main/resources/syntaxes/package.json") {
-            into("${project.name}/syntaxes")
-        }
-    }
-
-    buildPlugin {
-        dependsOn(updateGrammar)
-        duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-        from(generatedSyntaxesDir) {
-            into("syntaxes")
-        }
-        from("src/main/resources/syntaxes/package.json") {
-            into("syntaxes")
-        }
-    }
-
-    processResources {
-        dependsOn(updateGrammar)
+    compileJava {
+        dependsOn("generateWdlParser")
     }
 
     test {
         useJUnitPlatform()
+        // `ParsingTestCase` boots and disposes a platform `Application`; isolate each test
+        // class in its own JVM so that lifecycle doesn't leak into the plain unit tests.
+        setForkEvery(1)
     }
 
     patchPluginXml {
@@ -115,5 +103,11 @@ tasks {
 
     publishPlugin {
         token.set(System.getenv("PUBLISH_TOKEN"))
+    }
+
+    wrapper {
+        gradleVersion = "9.4.1"
+        distributionSha256Sum = "708d2c6ecc97ca9a11838ef64a6c2301151b8dd10387e22dc1a12c30557cab5b"
+        distributionType = Wrapper.DistributionType.ALL
     }
 }

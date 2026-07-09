@@ -1,4 +1,4 @@
-package org.stjude.sprocket
+package org.stjude.sprocket.lang
 
 import com.intellij.lang.Language
 

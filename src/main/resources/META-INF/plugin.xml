@@ -21,45 +21,100 @@
     ]]></description>
 
     <depends>com.intellij.modules.platform</depends>
-    <depends>org.jetbrains.plugins.textmate</depends>
     <depends>com.redhat.devtools.lsp4ij</depends>
+    <depends>com.jetbrains.sh</depends>
 
     <extensions defaultExtensionNs="com.intellij">
         <fileType
-            name="WDL"
-            implementationClass="org.stjude.sprocket.WdlFileType"
-            fieldName="INSTANCE"
-            language="WDL"
-            extensions="wdl"/>
-
-        <editorHighlighterProvider
-            filetype="WDL"
-            implementationClass="org.jetbrains.plugins.textmate.language.syntax.highlighting.TextMateEditorHighlighterProvider"/>
-
-        <lang.syntaxHighlighterFactory
-            language="WDL"
-            implementationClass="org.jetbrains.plugins.textmate.language.syntax.highlighting.TextMateSyntaxHighlighterFactory"/>
+                name="WDL"
+                implementationClass="org.stjude.sprocket.lang.WdlFileType"
+                fieldName="INSTANCE"
+                language="WDL"
+                extensions="wdl"/>
 
         <projectConfigurable
-            parentId="tools"
-            instance="org.stjude.sprocket.settings.SprocketConfigurable"
-            id="org.stjude.sprocket.settings.SprocketConfigurable"
-            displayName="Sprocket"/>
+                parentId="tools"
+                instance="org.stjude.sprocket.settings.SprocketConfigurable"
+                id="org.stjude.sprocket.settings.SprocketConfigurable"
+                displayName="Sprocket"/>
 
         <statusBarWidgetFactory
-            id="SprocketStatusBar"
-            implementation="org.stjude.sprocket.ui.SprocketStatusBarWidgetFactory"/>
+                id="SprocketStatusBar"
+                implementation="org.stjude.sprocket.ui.SprocketStatusBarWidgetFactory"/>
 
         <postStartupActivity
-            implementation="org.stjude.sprocket.SprocketStartupActivity"/>
+                implementation="org.stjude.sprocket.SprocketStartupActivity"/>
 
         <notificationGroup
-            id="Sprocket"
-            displayType="BALLOON"/>
-    </extensions>
+                id="Sprocket"
+                displayType="BALLOON"/>
 
-    <extensions defaultExtensionNs="com.intellij.textmate">
-        <bundleProvider implementation="org.stjude.sprocket.WdlTextMateBundleProvider"/>
+        <!-- Parser definition -->
+        <lang.parserDefinition language="WDL" implementationClass="org.stjude.sprocket.lang.WdlParserDefinition"/>
+
+        <!-- Features -->
+
+        <!-- Call Hierarchy support -->
+        <callHierarchyProvider
+                language="WDL"
+                implementationClass="com.redhat.devtools.lsp4ij.features.callHierarchy.LSPCallHierarchyProvider" />
+
+        <!-- Folding range support -->
+        <lang.foldingBuilder id="LSPFoldingBuilderForWdl"
+                             language="WDL"
+                             implementationClass="com.redhat.devtools.lsp4ij.features.foldingRange.LSPFoldingRangeBuilder"
+                             order="first"/>
+
+        <!-- Hints -->
+        <codeInsight.parameterInfo
+                id="LSPParameterInfoHandlerForWdl"
+                language="WDL"
+                order="first"
+                implementationClass="com.redhat.devtools.lsp4ij.features.signatureHelp.LSPParameterInfoHandler"/>
+
+        <!-- Syntax highlighting support -->
+        <lang.syntaxHighlighterFactory
+                language="WDL"
+                implementationClass="org.stjude.sprocket.ide.highlight.WdlSyntaxHighlighterFactory"/>
+        <annotator language="WDL" implementationClass="org.stjude.sprocket.ide.annotator.WdlHighlightingAnnotator"/>
+        <multiHostInjector implementation="org.stjude.sprocket.ide.injection.WdlCommandLanguageInjector"/>
+        <daemon.highlightInfoFilter implementation="org.stjude.sprocket.ide.injection.WdlCommandHighlightFilter"/>
+
+        <codeBlockProvider language="WDL"
+                           implementationClass="com.redhat.devtools.lsp4ij.features.codeBlockProvider.LSPCodeBlockProvider"
+                           order="first"/>
+
+        <!-- Commenter -->
+        <lang.commenter language="WDL" implementationClass="org.stjude.sprocket.ide.typing.WdlCommenter"/>
+
+        <!-- Matchers -->
+        <lang.braceMatcher language="WDL" implementationClass="org.stjude.sprocket.ide.typing.WdlBraceMatcher"/>
+        <lang.quoteHandler language="WDL" implementationClass="org.stjude.sprocket.ide.typing.WdlQuoteHandler"/>
+
+        <!-- Handlers -->
+        <enterHandlerDelegate implementation="org.stjude.sprocket.ide.typing.WdlEnterInCommandHandler"/>
+        <enterBetweenBracesDelegate language="WDL"
+                                    implementationClass="com.intellij.codeInsight.editorActions.enter.EnterBetweenBracesAndBracketsDelegate"/>
+
+        <!-- TODO indexing -->
+        <indexPatternBuilder implementation="org.stjude.sprocket.ide.todo.WdlTodoIndexPatternBuilder"/>
+        <todoIndexer filetype="WDL" implementationClass="org.stjude.sprocket.ide.todo.WdlTodoIndexer"/>
+
+        <!-- Formatter -->
+        <lang.formatter language="WDL"
+                        implementationClass="org.stjude.sprocket.ide.formatter.WdlFormattingModelBuilder"/>
+
+        <!-- PSI management -->
+        <lang.fileViewProviderFactory
+                language="WDL"
+                implementationClass="com.redhat.devtools.lsp4ij.features.semanticTokens.viewProvider.LSPSemanticTokensFileViewProviderFactory"/>
+
+        <!-- Structure view -->
+        <lang.psiStructureViewFactory
+                id="LSPDocumentSymbolStructureViewFactoryForWdl"
+                language="WDL"
+                order="first"
+                implementationClass="com.redhat.devtools.lsp4ij.features.documentSymbol.LSPDocumentSymbolStructureViewFactory"/>
     </extensions>
 
     <extensions defaultExtensionNs="com.redhat.devtools.lsp4ij">
