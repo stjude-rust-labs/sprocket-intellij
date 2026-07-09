@@ -7,16 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-07-09
+
 ### Added
 
-* LSP server logs now appear in the IDE console ([#1](https://github.com/claymcleod/sprocket-intellij/pull/1)).
-* Output levels expanded to Trace, Debug, Info, Warn, and Error ([#1](https://github.com/claymcleod/sprocket-intellij/pull/1)).
+* Native WDL lexer, parser, syntax highlighting, editor typing features, `sh` command-section injection, TODO indexing, and parser/lexer tests ([#2](https://github.com/stjude-rust-labs/sprocket-intellij/pull/2)).
+* LSP server logs now appear in the IDE console ([#1](https://github.com/stjude-rust-labs/sprocket-intellij/pull/1)).
+* Output levels expanded to Trace, Debug, Info, Warn, and Error ([#1](https://github.com/stjude-rust-labs/sprocket-intellij/pull/1)).
 
 ### Changed
 
-* Sprocket settings are now project-scoped instead of application-wide ([#1](https://github.com/claymcleod/sprocket-intellij/pull/1)).
-* Configuration changes apply to the running server immediately; the server only restarts when the binary path changes ([#1](https://github.com/claymcleod/sprocket-intellij/pull/1)).
-* Raised the supported IDE build range to `262.*` ([#3](https://github.com/claymcleod/sprocket-intellij/pull/3)).
+* Sprocket settings are now project-scoped instead of application-wide ([#1](https://github.com/stjude-rust-labs/sprocket-intellij/pull/1)).
+* Configuration changes apply to the running server immediately; the server only restarts when the binary path changes ([#1](https://github.com/stjude-rust-labs/sprocket-intellij/pull/1)).
+* Raised the supported IDE build range to `262.*` ([#3](https://github.com/stjude-rust-labs/sprocket-intellij/pull/3)).
 
 ## [0.1.1] - 2026-02-03
 
@@ -47,6 +50,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Configurable output level (quiet, information, verbose)
 - Optional lint diagnostics
 
-[Unreleased]: https://github.com/claymcleod/sprocket-intellij/compare/v0.1.1...HEAD
-[0.1.1]: https://github.com/claymcleod/sprocket-intellij/compare/v0.1.0...v0.1.1
-[0.1.0]: https://github.com/claymcleod/sprocket-intellij/releases/tag/v0.1.0
+[Unreleased]: https://github.com/stjude-rust-labs/sprocket-intellij/compare/v0.2.0...HEAD
+[0.2.0]: https://github.com/stjude-rust-labs/sprocket-intellij/compare/v0.1.1...v0.2.0
+[0.1.1]: https://github.com/stjude-rust-labs/sprocket-intellij/compare/v0.1.0...v0.1.1
+[0.1.0]: https://github.com/stjude-rust-labs/sprocket-intellij/releases/tag/v0.1.0
