@@ -14,7 +14,10 @@ import org.stjude.sprocket.lang.psi.WdlCommandContentText
  * @see org.stjude.sprocket.ide.injection.WdlCommandLanguageInjector
  */
 class WdlCommandHighlightFilter : HighlightInfoFilter {
-    override fun accept(highlightInfo: HighlightInfo, file: PsiFile?): Boolean {
+    override fun accept(
+        highlightInfo: HighlightInfo,
+        file: PsiFile?,
+    ): Boolean {
         if (file == null || file !is WdlFile) return true
 
         if (highlightInfo.severity != HighlightSeverity.INFORMATION) {
@@ -25,9 +28,12 @@ class WdlCommandHighlightFilter : HighlightInfoFilter {
         val endElement = file.findElementAt(maxOf(0, highlightInfo.endOffset - 1)) ?: return true
 
         val isCommandContent =
-            (startElement.parentOfType<WdlCommandContentText>(withSelf = true) != null && endElement.parentOfType<WdlCommandContentText>(
-                withSelf = true
-            ) != null)
+            (
+                startElement.parentOfType<WdlCommandContentText>(withSelf = true) != null &&
+                    endElement.parentOfType<WdlCommandContentText>(
+                        withSelf = true,
+                    ) != null
+            )
         return !isCommandContent
     }
 }

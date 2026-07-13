@@ -3,19 +3,16 @@ package org.stjude.sprocket.ide.highlight
 import com.intellij.lexer.Lexer
 import com.intellij.openapi.editor.DefaultLanguageHighlighterColors
 import com.intellij.openapi.editor.colors.TextAttributesKey
+import com.intellij.openapi.fileTypes.SyntaxHighlighterBase
 import com.intellij.psi.tree.IElementType
 import org.stjude.sprocket.lang.WdlLexerAdapter
-import com.intellij.openapi.fileTypes.SyntaxHighlighterBase
 import org.stjude.sprocket.lang.WdlTokenSets
 
 class WdlSyntaxHighlighter : SyntaxHighlighterBase() {
+    override fun getHighlightingLexer(): Lexer = WdlLexerAdapter()
 
-    override fun getHighlightingLexer(): Lexer {
-        return WdlLexerAdapter()
-    }
-
-    override fun getTokenHighlights(tokenType: IElementType): Array<TextAttributesKey> {
-        return when {
+    override fun getTokenHighlights(tokenType: IElementType): Array<TextAttributesKey> =
+        when {
             WdlTokenSets.PRIMITIVE_TYPES.contains(tokenType) -> arrayOf(KEYWORD)
             WdlTokenSets.KEYWORDS.contains(tokenType) -> arrayOf(KEYWORD)
             WdlTokenSets.OPERATORS.contains(tokenType) -> arrayOf(OPERATOR)
@@ -28,7 +25,6 @@ class WdlSyntaxHighlighter : SyntaxHighlighterBase() {
             WdlTokenSets.BRACKETS.contains(tokenType) -> arrayOf(BRACKETS)
             else -> emptyArray<TextAttributesKey>()
         }
-    }
 
     companion object {
         val KEYWORD = TextAttributesKey.createTextAttributesKey("WDL_KEYWORD", DefaultLanguageHighlighterColors.KEYWORD)

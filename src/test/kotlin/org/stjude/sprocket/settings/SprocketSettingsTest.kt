@@ -1,11 +1,12 @@
 package org.stjude.sprocket.settings
 
-import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertFalse
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
 
 class SprocketSettingsTest {
-
     private lateinit var settings: SprocketSettings
 
     @BeforeEach
@@ -30,11 +31,12 @@ class SprocketSettingsTest {
 
     @Test
     fun `loadState copies all properties`() {
-        val source = SprocketSettings().state.apply {
-            binaryPath = "/custom/path/sprocket"
-            options.outputLevel = OutputLevel.INFO
-            options.lintOptions.enabled = true
-        }
+        val source =
+            SprocketSettings().state.apply {
+                binaryPath = "/custom/path/sprocket"
+                options.outputLevel = OutputLevel.INFO
+                options.lintOptions.enabled = true
+            }
 
         settings.loadState(source)
 

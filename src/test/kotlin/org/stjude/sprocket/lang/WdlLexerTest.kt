@@ -8,7 +8,6 @@ import org.junit.jupiter.api.Test
 import org.stjude.sprocket.lang.psi.WdlTokenTypes
 
 class WdlLexerTest {
-
     @Test
     fun `keywords lex to a single keyword token`() {
         assertSingleToken("alias", WdlTokenTypes.KW_ALIAS)
@@ -56,6 +55,7 @@ class WdlLexerTest {
 
     @Test
     fun `placeholders balance braces`() {
+        // @formatter:off
         assertTokenTypes(
             "command <<<~{write_json({\"x\": {\"y\": y}})}>>>",
             WdlTokenTypes.KW_COMMAND,
@@ -80,9 +80,13 @@ class WdlLexerTest {
                 WdlTokenTypes.PLACEHOLDER_CLOSE,
             WdlTokenTypes.HEREDOC_CLOSE,
         )
+        // @formatter:on
     }
 
-    private fun assertSingleToken(text: String, expected: IElementType) {
+    private fun assertSingleToken(
+        text: String,
+        expected: IElementType,
+    ) {
         val lexer = WdlLexerAdapter()
         lexer.start(text, 0, text.length, 0)
 
@@ -93,7 +97,10 @@ class WdlLexerTest {
         assertNull(lexer.tokenType, "`$text` should lex to a single token")
     }
 
-    private fun assertTokenTypes(text: String, vararg expected: IElementType) {
+    private fun assertTokenTypes(
+        text: String,
+        vararg expected: IElementType,
+    ) {
         val lexer = WdlLexerAdapter()
         lexer.start(text, 0, text.length, 0)
 

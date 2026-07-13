@@ -9,7 +9,7 @@ class OpenSettingsAction : AnAction("Open Settings", "Open Sprocket settings", n
     override fun actionPerformed(e: AnActionEvent) {
         ShowSettingsUtil.getInstance().showSettingsDialog(
             e.project,
-            SprocketConfigurable::class.java
+            SprocketConfigurable::class.java,
         )
     }
 }

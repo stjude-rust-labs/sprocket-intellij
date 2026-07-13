@@ -3,10 +3,17 @@ package org.stjude.sprocket.settings
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory
 import com.intellij.openapi.options.BoundConfigurable
 import com.intellij.openapi.project.Project
-import com.intellij.ui.dsl.builder.*
+import com.intellij.ui.dsl.builder.AlignX
+import com.intellij.ui.dsl.builder.bindItem
+import com.intellij.ui.dsl.builder.bindSelected
+import com.intellij.ui.dsl.builder.bindText
+import com.intellij.ui.dsl.builder.panel
+import com.intellij.ui.dsl.builder.toNullableProperty
 import com.redhat.devtools.lsp4ij.LanguageServerManager
 
-class SprocketConfigurable(private val project: Project) : BoundConfigurable("Sprocket") {
+class SprocketConfigurable(
+    private val project: Project,
+) : BoundConfigurable("Sprocket") {
     private val settings get() = SprocketSettings.getInstance(project)
     private var originalSprocketBinaryPath: String = settings.binaryPath()
 
@@ -27,28 +34,28 @@ class SprocketConfigurable(private val project: Project) : BoundConfigurable("Sp
         LanguageServerManager.getInstance(project).start("sprocketLanguageServer")
     }
 
-    override fun createPanel() = panel {
-        row("Sprocket binary path:") {
-            textFieldWithBrowseButton(
-                "Select Sprocket Binary",
-                project,
-                FileChooserDescriptorFactory.createSingleFileDescriptor()
-            )
-                .align(AlignX.FILL)
-                .bindText(settings.state::binaryPath)
-                .comment("Leave empty to use PATH lookup")
+    override fun createPanel() =
+        panel {
+            row("Sprocket binary path:") {
+                textFieldWithBrowseButton(
+                    "Select Sprocket Binary",
+                    project,
+                    FileChooserDescriptorFactory.createSingleFileDescriptor(),
+                ).align(AlignX.FILL)
+                    .bindText(settings.state::binaryPath)
+                    .comment("Leave empty to use PATH lookup")
+            }
+            row("Output level:") {
+                comboBox(OutputLevel.entries)
+                    .bindItem(settings.state.options::outputLevel.toNullableProperty())
+            }
+            row {
+                checkBox("Enable lint checks")
+                    .bindSelected(settings.state.options.lintOptions::enabled)
+            }
+            row {
+                checkBox("Enable formatting")
+                    .bindSelected(settings.state::format)
+            }
         }
-        row("Output level:") {
-            comboBox(OutputLevel.entries)
-                .bindItem(settings.state.options::outputLevel.toNullableProperty())
-        }
-        row {
-            checkBox("Enable lint checks")
-                .bindSelected(settings.state.options.lintOptions::enabled)
-        }
-        row {
-            checkBox("Enable formatting")
-                .bindSelected(settings.state::format)
-        }
-    }
 }

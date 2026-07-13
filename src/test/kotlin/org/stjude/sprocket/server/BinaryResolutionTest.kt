@@ -1,13 +1,16 @@
 package org.stjude.sprocket.server
 
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertFalse
+import org.junit.jupiter.api.Assertions.assertNotNull
+import org.junit.jupiter.api.Assertions.assertNull
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.io.TempDir
 import java.io.File
 import java.nio.file.Path
 
 class BinaryResolutionTest {
-
     @TempDir
     lateinit var tempDir: Path
 
@@ -37,10 +40,11 @@ class BinaryResolutionTest {
         val dir1 = tempDir.resolve("dir1").toFile().also { it.mkdirs() }
         val dir2 = tempDir.resolve("dir2").toFile().also { it.mkdirs() }
 
-        val binary1 = File(dir1, "sprocket").also {
-            it.createNewFile()
-            it.setExecutable(true)
-        }
+        val binary1 =
+            File(dir1, "sprocket").also {
+                it.createNewFile()
+                it.setExecutable(true)
+            }
         File(dir2, "sprocket").also {
             it.createNewFile()
             it.setExecutable(true)
@@ -55,10 +59,11 @@ class BinaryResolutionTest {
 
     @Test
     fun `findInPath skips non-executable files`() {
-        val nonExecutable = File(tempDir.toFile(), "sprocket").also {
-            it.createNewFile()
-            it.setExecutable(false)
-        }
+        val nonExecutable =
+            File(tempDir.toFile(), "sprocket").also {
+                it.createNewFile()
+                it.setExecutable(false)
+            }
 
         val result = findInPath("sprocket", tempDir.toString())
 
@@ -77,7 +82,7 @@ class BinaryResolutionTest {
     @Test
     fun `findInPath handles empty PATH components`() {
         val binary = createExecutable("sprocket")
-        val pathEnv = ":${tempDir}::"
+        val pathEnv = ":$tempDir::"
 
         val result = findInPath("sprocket", pathEnv)
 
@@ -87,10 +92,11 @@ class BinaryResolutionTest {
     @Test
     fun `findInPath handles paths with spaces`() {
         val dirWithSpaces = tempDir.resolve("dir with spaces").toFile().also { it.mkdirs() }
-        val binary = File(dirWithSpaces, "sprocket").also {
-            it.createNewFile()
-            it.setExecutable(true)
-        }
+        val binary =
+            File(dirWithSpaces, "sprocket").also {
+                it.createNewFile()
+                it.setExecutable(true)
+            }
 
         val result = findInPath("sprocket", dirWithSpaces.absolutePath)
 
@@ -112,10 +118,11 @@ class BinaryResolutionTest {
 
     @Test
     fun `isValidBinary returns false for non-executable file`() {
-        val nonExecutable = File(tempDir.toFile(), "sprocket").also {
-            it.createNewFile()
-            it.setExecutable(false)
-        }
+        val nonExecutable =
+            File(tempDir.toFile(), "sprocket").also {
+                it.createNewFile()
+                it.setExecutable(false)
+            }
         assertFalse(isValidBinary(nonExecutable))
     }
 
@@ -125,14 +132,16 @@ class BinaryResolutionTest {
         assertFalse(isValidBinary(directory))
     }
 
-    private fun createExecutable(name: String): File {
-        return File(tempDir.toFile(), name).also {
+    private fun createExecutable(name: String): File =
+        File(tempDir.toFile(), name).also {
             it.createNewFile()
             it.setExecutable(true)
         }
-    }
 
-    private fun findInPath(name: String, pathEnv: String?): File? {
+    private fun findInPath(
+        name: String,
+        pathEnv: String?,
+    ): File? {
         if (pathEnv == null) return null
         val pathSeparator = File.pathSeparator
 
@@ -146,7 +155,5 @@ class BinaryResolutionTest {
         return null
     }
 
-    private fun isValidBinary(file: File): Boolean {
-        return file.exists() && file.isFile && file.canExecute()
-    }
+    private fun isValidBinary(file: File): Boolean = file.exists() && file.isFile && file.canExecute()
 }

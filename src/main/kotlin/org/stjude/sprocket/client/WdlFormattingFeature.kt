@@ -11,15 +11,11 @@ class WdlFormattingFeature : LSPFormattingFeature() {
      *
      * @see org.stjude.sprocket.ide.formatter.WdlFormattingModelBuilder
      */
-    override fun isExistingFormatterOverrideable(file: PsiFile): Boolean {
-        return true
-    }
+    override fun isExistingFormatterOverrideable(file: PsiFile): Boolean = true
 
     /**
      * Gate LSP formatting on the "Enable formatting" setting. When disabled, the
      * PSI auto-indenter still applies; only the server's full formatting is suppressed.
      */
-    override fun isEnabled(file: PsiFile): Boolean {
-        return SprocketSettings.getInstance(file.project).format()
-    }
+    override fun isEnabled(file: PsiFile): Boolean = SprocketSettings.getInstance(file.project).format()
 }

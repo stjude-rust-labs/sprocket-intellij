@@ -1,10 +1,12 @@
 package org.stjude.sprocket.settings
 
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertNotNull
+import org.junit.jupiter.api.Assertions.assertNull
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.Assertions.*
 
 class OutputLevelTest {
-
     @Test
     fun `Verbose levels have correct CLI arguments`() {
         assertEquals("--verbose", OutputLevel.INFO.cliArg)

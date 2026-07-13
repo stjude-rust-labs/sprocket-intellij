@@ -13,34 +13,20 @@ import com.intellij.psi.tree.TokenSet
 import org.stjude.sprocket.lang.parser.WdlParser
 import org.stjude.sprocket.lang.psi.WdlTokenTypes
 
+val FILE: IFileElementType = IFileElementType(WdlLanguage)
+
 class WdlParserDefinition : ParserDefinition {
-    private val FILE: IFileElementType = IFileElementType(WdlLanguage)
-    override fun createLexer(project: Project?): Lexer {
-        return WdlLexerAdapter()
-    }
+    override fun createLexer(project: Project?): Lexer = WdlLexerAdapter()
 
-    override fun createParser(project: Project?): PsiParser {
-        return WdlParser()
-    }
+    override fun createParser(project: Project?): PsiParser = WdlParser()
 
-    override fun getFileNodeType(): IFileElementType {
-        return FILE
-    }
+    override fun getFileNodeType(): IFileElementType = FILE
 
-    override fun getCommentTokens(): TokenSet {
-        return WdlTokenSets.COMMENTS
-    }
+    override fun getCommentTokens(): TokenSet = WdlTokenSets.COMMENTS
 
-    override fun getStringLiteralElements(): TokenSet {
-        return TokenSet.create(WdlTokenTypes.STRING_LITERAL)
-    }
+    override fun getStringLiteralElements(): TokenSet = TokenSet.create(WdlTokenTypes.STRING_LITERAL)
 
-    override fun createElement(node: ASTNode?): PsiElement {
-        return WdlTokenTypes.Factory.createElement(node)
-    }
+    override fun createElement(node: ASTNode?): PsiElement = WdlTokenTypes.Factory.createElement(node)
 
-    override fun createFile(viewProvider: FileViewProvider): PsiFile {
-        return WdlFile(viewProvider)
-    }
-
+    override fun createFile(viewProvider: FileViewProvider): PsiFile = WdlFile(viewProvider)
 }

@@ -9,13 +9,9 @@ import org.stjude.sprocket.client.WdlFormattingFeature
 import org.stjude.sprocket.client.WdlLanguageClient
 
 class SprocketLanguageServerFactory : LanguageServerFactory {
+    override fun createConnectionProvider(project: Project): StreamConnectionProvider = SprocketStreamConnectionProvider(project)
 
-    override fun createConnectionProvider(project: Project): StreamConnectionProvider =
-        SprocketStreamConnectionProvider(project)
+    override fun createLanguageClient(project: Project): LanguageClientImpl = WdlLanguageClient(project)
 
-    override fun createLanguageClient(project: Project): LanguageClientImpl =
-        WdlLanguageClient(project)
-
-    override fun createClientFeatures(): LSPClientFeatures =
-        LSPClientFeatures().setFormattingFeature(WdlFormattingFeature())
+    override fun createClientFeatures(): LSPClientFeatures = LSPClientFeatures().setFormattingFeature(WdlFormattingFeature())
 }
