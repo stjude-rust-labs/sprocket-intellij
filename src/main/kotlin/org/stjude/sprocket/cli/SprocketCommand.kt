@@ -10,7 +10,9 @@ import java.io.File
 /**
  * Utilities for building `GeneralCommandLine`s for the `sprocket` binary.
  */
-class SprocketCommand(val project: Project) {
+class SprocketCommand(
+    val project: Project,
+) {
     val projectSettings = SprocketSettings.getInstance(project)
     val sprocketBinary = SprocketServerManager.getInstance().resolveBinary(project)
 
@@ -30,9 +32,10 @@ class SprocketCommand(val project: Project) {
             lint: Boolean,
             workDirectory: String?,
         ): GeneralCommandLine {
-            val command = GeneralCommandLine(binary.absolutePath)
-                .withWorkDirectory(workDirectory)
-                .withCharset(Charsets.UTF_8)
+            val command =
+                GeneralCommandLine(binary.absolutePath)
+                    .withWorkDirectory(workDirectory)
+                    .withCharset(Charsets.UTF_8)
 
             outputLevel.cliArg?.let { command.addParameter(it) }
             command.addParameters("analyzer", "--stdio")

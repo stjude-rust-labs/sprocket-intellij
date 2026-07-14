@@ -12,8 +12,7 @@ class SprocketStatusBarWidgetFactory : StatusBarWidgetFactory {
 
     override fun isAvailable(project: Project): Boolean = true
 
-    override fun createWidget(project: Project): StatusBarWidget =
-        SprocketStatusBarWidget(project)
+    override fun createWidget(project: Project): StatusBarWidget = SprocketStatusBarWidget(project)
 
     override fun disposeWidget(widget: StatusBarWidget) {
         widget.dispose()

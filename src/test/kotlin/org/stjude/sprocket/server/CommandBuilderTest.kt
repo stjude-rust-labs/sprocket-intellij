@@ -1,13 +1,14 @@
 package org.stjude.sprocket.server
 
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertFalse
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.Assertions.*
 import org.stjude.sprocket.cli.SprocketCommand
 import org.stjude.sprocket.settings.OutputLevel
 import java.io.File
 
 class CommandBuilderTest {
-
     @Test
     fun `serverCommand creates basic command with analyzer and stdio`() {
         val binary = File("/usr/local/bin/sprocket")
@@ -66,7 +67,7 @@ class CommandBuilderTest {
 
         assertEquals(
             listOf("/usr/local/bin/sprocket", "--verbose", "analyzer", "--stdio", "--lint"),
-            command
+            command,
         )
     }
 
@@ -96,10 +97,15 @@ class CommandBuilderTest {
         val binary = File("relative/path/sprocket")
         val command = serverCommand(binary, OutputLevel.WARN, lint = false)
 
-        assertTrue(command[0].startsWith("/") || command[0].contains(":"),
-            "Command should use absolute path")
+        assertTrue(
+            command[0].startsWith("/") || command[0].contains(":"),
+            "Command should use absolute path",
+        )
     }
 
-    private fun serverCommand(binary: File, outputLevel: OutputLevel, lint: Boolean): List<String> =
-        SprocketCommand.serverCommand(binary, outputLevel, lint, workDirectory = null).getCommandLineList(null)
+    private fun serverCommand(
+        binary: File,
+        outputLevel: OutputLevel,
+        lint: Boolean,
+    ): List<String> = SprocketCommand.serverCommand(binary, outputLevel, lint, workDirectory = null).getCommandLineList(null)
 }

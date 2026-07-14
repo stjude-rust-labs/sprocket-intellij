@@ -12,7 +12,7 @@ import com.intellij.util.containers.ContainerUtil
 @Service(Service.Level.PROJECT)
 @State(
     name = "org.stjude.sprocket.settings.SprocketSettings",
-    storages = [Storage("sprocket.xml")]
+    storages = [Storage("sprocket.xml")],
 )
 class SprocketSettings : PersistentStateComponent<SprocketSettings.State> {
     var theState = State()
@@ -51,12 +51,12 @@ class SprocketSettings : PersistentStateComponent<SprocketSettings.State> {
     data class State(
         var binaryPath: String = "",
         var format: Boolean = true,
-        var options: ServerOptions = ServerOptions()
+        var options: ServerOptions = ServerOptions(),
     )
 
     data class ServerOptions(
         var outputLevel: OutputLevel = OutputLevel.ERROR,
-        var lintOptions: LintOptions = LintOptions()
+        var lintOptions: LintOptions = LintOptions(),
     ) {
         fun toLSPSettings(): JsonObject {
             val settings = JsonObject()
@@ -81,7 +81,6 @@ class SprocketSettings : PersistentStateComponent<SprocketSettings.State> {
     }
 
     companion object {
-        fun getInstance(project: Project): SprocketSettings =
-            project.getService(SprocketSettings::class.java)
+        fun getInstance(project: Project): SprocketSettings = project.getService(SprocketSettings::class.java)
     }
 }

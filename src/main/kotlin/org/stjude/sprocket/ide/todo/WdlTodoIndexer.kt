@@ -12,8 +12,9 @@ class WdlTodoIndexer : LexerBasedTodoIndexer() {
     override fun createLexer(consumer: OccurrenceConsumer): Lexer = WdlFilterLexer(consumer)
 }
 
-private class WdlFilterLexer(consumer: OccurrenceConsumer) : BaseFilterLexer(WdlLexerAdapter(), consumer) {
-
+private class WdlFilterLexer(
+    consumer: OccurrenceConsumer,
+) : BaseFilterLexer(WdlLexerAdapter(), consumer) {
     override fun advance() {
         if (myDelegate.tokenType in WdlTokenSets.COMMENTS) {
             scanWordsInToken(UsageSearchContext.IN_COMMENTS.toInt(), false, false)

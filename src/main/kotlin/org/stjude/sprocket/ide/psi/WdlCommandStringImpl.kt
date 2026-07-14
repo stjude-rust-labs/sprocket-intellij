@@ -10,8 +10,10 @@ import com.intellij.psi.PsiLanguageInjectionHost
  *
  * @see org.stjude.sprocket.ide.injection.WdlCommandHighlightFilter
  */
-abstract class WdlCommandStringImpl(node: ASTNode) : ASTWrapperPsiElement(node), PsiLanguageInjectionHost {
-
+abstract class WdlCommandStringImpl(
+    node: ASTNode,
+) : ASTWrapperPsiElement(node),
+    PsiLanguageInjectionHost {
     override fun isValidHost(): Boolean = true
 
     /**
@@ -20,11 +22,7 @@ abstract class WdlCommandStringImpl(node: ASTNode) : ASTWrapperPsiElement(node),
      * the WDL document. Propagating them would require rebuilding the command-content PSI from
      * the edited text, which is not worth the complexity for these highlighting-only injections.
      */
-    override fun updateText(text: String): PsiLanguageInjectionHost {
-        return this
-    }
+    override fun updateText(text: String): PsiLanguageInjectionHost = this
 
-    override fun createLiteralTextEscaper(): LiteralTextEscaper<out PsiLanguageInjectionHost> {
-        return LiteralTextEscaper.createSimple(this)
-    }
+    override fun createLiteralTextEscaper(): LiteralTextEscaper<out PsiLanguageInjectionHost> = LiteralTextEscaper.createSimple(this)
 }

@@ -34,10 +34,10 @@ import org.stjude.sprocket.lang.psi.WdlTokenTypes
  * @see org.stjude.sprocket.ide.formatter.WdlBlock
  */
 class WdlFormattingModelBuilder : FormattingModelBuilder {
-
     override fun createModel(formattingContext: FormattingContext): FormattingModel {
         val settings = formattingContext.codeStyleSettings
 
+        // @formatter:off
         val spacingBuilder = SpacingBuilder(settings, WdlLanguage)
             .after(WdlTokenTypes.COMMA).spacing(1, 1, 0, true, 0)
             .before(WdlTokenTypes.COMMA).spaceIf(false)
@@ -62,19 +62,21 @@ class WdlFormattingModelBuilder : FormattingModelBuilder {
             // `sprocket format` can handle all the complexities of keeping the WDL actually formatted.
             .afterInside(WdlTokenTypes.L_BRACE, WdlTokenSets.BLOCKS).parentDependentLFSpacing(1, 1, true, 0)
             .beforeInside(WdlTokenTypes.R_BRACE, WdlTokenSets.BLOCKS).parentDependentLFSpacing(1, 1, true, 0)
+        // @formatter:on
 
-        val block = WdlBlock(
-            formattingContext.node,
-            null,
-            null,
-            Indent.getNoneIndent(),
-            spacingBuilder
-        )
+        val block =
+            WdlBlock(
+                formattingContext.node,
+                null,
+                null,
+                Indent.getNoneIndent(),
+                spacingBuilder,
+            )
 
         return FormattingModelProvider.createFormattingModelForPsiFile(
             formattingContext.containingFile,
             block,
-            settings
+            settings,
         )
     }
 }

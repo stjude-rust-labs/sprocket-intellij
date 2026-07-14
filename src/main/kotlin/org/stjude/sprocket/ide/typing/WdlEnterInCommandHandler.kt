@@ -1,14 +1,14 @@
 package org.stjude.sprocket.ide.typing
 
 import com.intellij.application.options.CodeStyle
+import com.intellij.codeInsight.editorActions.enter.EnterHandlerDelegate.Result
 import com.intellij.codeInsight.editorActions.enter.EnterHandlerDelegateAdapter
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.actionSystem.EditorActionHandler
 import com.intellij.openapi.util.Ref
-import com.intellij.psi.PsiFile
-import com.intellij.codeInsight.editorActions.enter.EnterHandlerDelegate.Result
 import com.intellij.psi.PsiDocumentManager
+import com.intellij.psi.PsiFile
 import com.intellij.util.text.CharArrayUtil
 import org.stjude.sprocket.lang.WdlFile
 import org.stjude.sprocket.lang.psi.WdlTokenTypes
@@ -35,7 +35,7 @@ class WdlEnterInCommandHandler : EnterHandlerDelegateAdapter() {
         caretOffsetRef: Ref<Int>,
         caretAdvance: Ref<Int>,
         dataContext: DataContext,
-        originalHandler: EditorActionHandler?
+        originalHandler: EditorActionHandler?,
     ): Result {
         if (file !is WdlFile) return Result.Continue
 
@@ -57,9 +57,9 @@ class WdlEnterInCommandHandler : EnterHandlerDelegateAdapter() {
         val rightElement = file.findElementAt(rightOffset) ?: return Result.Continue
 
         val parentType = leftElement.parent.node.elementType
-        if (parentType != WdlTokenTypes.HEREDOC_COMMAND_BLOCK
-            || leftElement.node.elementType != WdlTokenTypes.HEREDOC_OPEN
-            || rightElement.node.elementType != WdlTokenTypes.HEREDOC_CLOSE
+        if (parentType != WdlTokenTypes.HEREDOC_COMMAND_BLOCK ||
+            leftElement.node.elementType != WdlTokenTypes.HEREDOC_OPEN ||
+            rightElement.node.elementType != WdlTokenTypes.HEREDOC_CLOSE
         ) {
             // Not in a heredoc command block
             return Result.Continue
@@ -78,11 +78,12 @@ class WdlEnterInCommandHandler : EnterHandlerDelegateAdapter() {
 
         // Get the indent size from code style settings
         val codeStyleSettings = CodeStyle.getSettings(file)
-        val indentString = if (codeStyleSettings.useTabCharacter(file.fileType)) {
-            "\t"
-        } else {
-            " ".repeat(codeStyleSettings.getIndentSize(file.fileType))
-        }
+        val indentString =
+            if (codeStyleSettings.useTabCharacter(file.fileType)) {
+                "\t"
+            } else {
+                " ".repeat(codeStyleSettings.getIndentSize(file.fileType))
+            }
 
         val startReplaceOffset = leftElement.textRange.endOffset
         val endReplaceOffset = rightElement.textRange.startOffset

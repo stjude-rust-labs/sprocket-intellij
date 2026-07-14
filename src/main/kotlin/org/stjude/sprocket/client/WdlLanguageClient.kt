@@ -7,15 +7,18 @@ import org.eclipse.lsp4j.UnregistrationParams
 import org.stjude.sprocket.settings.SprocketSettings
 import java.util.concurrent.CompletableFuture
 
-class WdlLanguageClient(project: Project) : LanguageClientImpl(project) {
+class WdlLanguageClient(
+    project: Project,
+) : LanguageClientImpl(project) {
     @Volatile
     private var didChangeConfigurationSupported = false
 
-    private val maybeDidChangeConfigurationListener = Runnable {
-        if (didChangeConfigurationSupported) {
-            didChangeConfigurationListener.run()
+    private val maybeDidChangeConfigurationListener =
+        Runnable {
+            if (didChangeConfigurationSupported) {
+                didChangeConfigurationListener.run()
+            }
         }
-    }
 
     init {
         SprocketSettings.getInstance(project).addChangeHandler(maybeDidChangeConfigurationListener)
@@ -39,9 +42,7 @@ class WdlLanguageClient(project: Project) : LanguageClientImpl(project) {
         return super.unregisterCapability(params)
     }
 
-    override fun createSettings(): Any {
-        return SprocketSettings.getInstance(project).toLSPSettings()
-    }
+    override fun createSettings(): Any = SprocketSettings.getInstance(project).toLSPSettings()
 
     override fun dispose() {
         super.dispose()

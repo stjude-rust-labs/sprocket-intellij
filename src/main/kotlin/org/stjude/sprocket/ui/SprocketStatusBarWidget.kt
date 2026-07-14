@@ -10,9 +10,10 @@ import com.intellij.openapi.wm.impl.status.EditorBasedWidget
 import com.intellij.util.Consumer
 import java.awt.event.MouseEvent
 
-class SprocketStatusBarWidget(project: Project) : EditorBasedWidget(project),
+class SprocketStatusBarWidget(
+    project: Project,
+) : EditorBasedWidget(project),
     StatusBarWidget.MultipleTextValuesPresentation {
-
     override fun ID(): String = "SprocketStatusBar"
 
     override fun getTooltipText(): String = "Sprocket"
@@ -20,10 +21,11 @@ class SprocketStatusBarWidget(project: Project) : EditorBasedWidget(project),
     override fun getSelectedValue(): String = "Sprocket"
 
     override fun getPopup(): ListPopup? {
-        val actions = DefaultActionGroup().apply {
-            add(RestartServerAction())
-            add(OpenSettingsAction())
-        }
+        val actions =
+            DefaultActionGroup().apply {
+                add(RestartServerAction())
+                add(OpenSettingsAction())
+            }
 
         val component = myStatusBar?.component ?: return null
         val dataContext = DataManager.getInstance().getDataContext(component)
@@ -33,7 +35,7 @@ class SprocketStatusBarWidget(project: Project) : EditorBasedWidget(project),
             actions,
             dataContext,
             JBPopupFactory.ActionSelectionAid.SPEEDSEARCH,
-            true
+            true,
         )
     }
 

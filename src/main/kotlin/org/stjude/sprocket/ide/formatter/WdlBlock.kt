@@ -20,15 +20,17 @@ class WdlBlock(
     wrap: Wrap?,
     alignment: Alignment?,
     private val indent: Indent?,
-    private val spacingBuilder: SpacingBuilder
+    private val spacingBuilder: SpacingBuilder,
 ) : AbstractBlock(node, wrap, alignment) {
     override fun buildChildren(): List<Block> {
-        val children = myNode.getChildren(null)
-            .filter { it.textLength > 0 && it.elementType !== TokenType.WHITE_SPACE }
-            .map { childNode: ASTNode ->
-                val childIndent = computeChildIndent(childNode)
-                WdlBlock(childNode, null, null, childIndent, spacingBuilder)
-            }
+        val children =
+            myNode
+                .getChildren(null)
+                .filter { it.textLength > 0 && it.elementType !== TokenType.WHITE_SPACE }
+                .map { childNode: ASTNode ->
+                    val childIndent = computeChildIndent(childNode)
+                    WdlBlock(childNode, null, null, childIndent, spacingBuilder)
+                }
 
         return children
     }
@@ -71,9 +73,10 @@ class WdlBlock(
         return ChildAttributes(Indent.getNoneIndent(), null)
     }
 
-    override fun getSpacing(child1: Block?, child2: Block): Spacing? {
-        return spacingBuilder.getSpacing(this, child1, child2)
-    }
+    override fun getSpacing(
+        child1: Block?,
+        child2: Block,
+    ): Spacing? = spacingBuilder.getSpacing(this, child1, child2)
 
     override fun isLeaf(): Boolean = node.firstChildNode == null
 }

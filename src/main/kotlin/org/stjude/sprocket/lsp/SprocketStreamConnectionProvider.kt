@@ -6,7 +6,9 @@ import com.redhat.devtools.lsp4ij.server.OSProcessStreamConnectionProvider
 import org.stjude.sprocket.cli.SprocketCommand
 import org.stjude.sprocket.server.SprocketServerManager
 
-class SprocketStreamConnectionProvider(private val project: Project) : OSProcessStreamConnectionProvider() {
+class SprocketStreamConnectionProvider(
+    private val project: Project,
+) : OSProcessStreamConnectionProvider() {
     companion object {
         private val LOG = Logger.getInstance(SprocketStreamConnectionProvider::class.java)
     }
@@ -16,7 +18,7 @@ class SprocketStreamConnectionProvider(private val project: Project) : OSProcess
         val command = SprocketCommand(project).server()
 
         if (command != null) {
-            LOG.info("Starting sprocket server with command: `${command}`")
+            LOG.info("Starting sprocket server with command: `$command`")
             super.setCommandLine(command)
             super.start()
         } else {

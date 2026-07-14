@@ -28,27 +28,26 @@ class SprocketServerManager {
                 listOf(
                     "$home/.cargo/bin/sprocket",
                     "/opt/homebrew/bin/sprocket",
-                    "/usr/local/bin/sprocket"
+                    "/usr/local/bin/sprocket",
                 )
             }
         }
 
-        fun getInstance(): SprocketServerManager =
-            ApplicationManager.getApplication().getService(SprocketServerManager::class.java)
+        fun getInstance(): SprocketServerManager = ApplicationManager.getApplication().getService(SprocketServerManager::class.java)
     }
 
     fun notifyMissingBinary(project: Project) {
         if (notifiedMissingBinary) return
         notifiedMissingBinary = true
 
-        NotificationGroupManager.getInstance()
+        NotificationGroupManager
+            .getInstance()
             .getNotificationGroup("Sprocket")
             .createNotification(
                 "Sprocket not found",
                 "The sprocket binary was not found. Please install sprocket and configure the path in Settings → Tools → Sprocket.",
-                NotificationType.ERROR
-            )
-            .notify(project)
+                NotificationType.ERROR,
+            ).notify(project)
     }
 
     fun resolveBinary(project: Project): File? {
@@ -77,7 +76,8 @@ class SprocketServerManager {
     private fun findInPath(name: String): File? {
         val pathEnv = EnvironmentUtil.getValue("PATH") ?: System.getenv("PATH") ?: return null
 
-        return pathEnv.split(File.pathSeparator)
+        return pathEnv
+            .split(File.pathSeparator)
             .map { File(it, name) }
             .firstOrNull { it.exists() && it.canExecute() }
     }
