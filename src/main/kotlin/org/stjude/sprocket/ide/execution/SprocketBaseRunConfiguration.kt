@@ -5,6 +5,7 @@ import com.intellij.execution.configurations.RunConfigurationBase
 import com.intellij.execution.configurations.RunProfileState
 import com.intellij.openapi.project.Project
 import org.jdom.Element
+import org.stjude.sprocket.ide.ui.SprocketTestConfigurationEditor
 
 /**
  * Base run configuration for `sprocket` commands.
@@ -14,8 +15,9 @@ import org.jdom.Element
 abstract class SprocketBaseRunConfiguration(
     project: Project,
     factory: ConfigurationFactory,
-    name: String,
+    name: String
 ) : RunConfigurationBase<RunProfileState>(project, factory, name) {
+
     var colorOption: ColorOption = ColorOption.AUTO
     var configPath: String = ""
     var skipConfigSearch: Boolean = false

@@ -1,4 +1,4 @@
-package org.stjude.sprocket.ide.execution.run
+package org.stjude.sprocket.ide.execution.test
 
 import com.intellij.execution.configurations.CommandLineState
 import com.intellij.execution.process.ProcessHandler
@@ -8,8 +8,8 @@ import org.stjude.sprocket.cli.SprocketCommand
 import com.intellij.execution.ExecutionException
 import org.stjude.sprocket.server.SprocketServerManager
 
-class SprocketRunRunProfileState(
-    private val config: SprocketRunRunConfiguration,
+class SprocketTestRunProfileState(
+    private val config: SprocketTestRunConfiguration,
     environment: ExecutionEnvironment
 ) : CommandLineState(environment) {
 
@@ -18,7 +18,7 @@ class SprocketRunRunProfileState(
         val manager = SprocketServerManager.getInstance()
         val sprocketCmd = SprocketCommand(config.project)
 
-        val commandLine = sprocketCmd.run(config)
+        val commandLine = sprocketCmd.test(config)
         if (commandLine == null) {
             manager.notifyMissingBinary(config.project)
             throw ExecutionException("Sprocket binary could not be resolved")

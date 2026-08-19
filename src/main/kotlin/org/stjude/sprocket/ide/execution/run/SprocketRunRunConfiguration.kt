@@ -15,36 +15,27 @@ import org.stjude.sprocket.ide.ui.SprocketRunConfigurationEditor
 class SprocketRunRunConfiguration(
     project: Project,
     factory: ConfigurationFactory,
-    name: String,
+    name: String
 ) : SprocketBaseRunConfiguration(project, factory, name) {
+
     var sourcePath: String = ""
     var target: String = ""
-    var outputDir: String = ""
-    var suffix: String = ""
-    var showStderr: Boolean = false
 
     override fun getConfigurationEditor() = SprocketRunConfigurationEditor()
 
-    override fun getState(
-        executor: Executor,
-        environment: ExecutionEnvironment,
-    ): RunProfileState = SprocketRunRunProfileState(this, environment)
+    override fun getState(executor: Executor, environment: ExecutionEnvironment): RunProfileState {
+        return SprocketRunRunProfileState(this, environment)
+    }
 
     override fun readExternal(element: Element) {
         super.readExternal(element)
         sourcePath = element.getAttributeValue("sourcePath") ?: ""
         target = element.getAttributeValue("target") ?: ""
-        outputDir = element.getAttributeValue("outputDir") ?: ""
-        suffix = element.getAttributeValue("suffix") ?: ""
-        showStderr = element.getAttributeValue("showStderr").toBoolean()
     }
 
     override fun writeExternal(element: Element) {
         super.writeExternal(element)
         element.setAttribute("sourcePath", sourcePath)
         element.setAttribute("target", target)
-        element.setAttribute("outputDir", outputDir)
-        element.setAttribute("suffix", suffix)
-        element.setAttribute("showStderr", showStderr.toString())
     }
 }
