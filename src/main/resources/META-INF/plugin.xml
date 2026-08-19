@@ -23,6 +23,7 @@
     <depends>com.intellij.modules.platform</depends>
     <depends>com.redhat.devtools.lsp4ij</depends>
     <depends>com.jetbrains.sh</depends>
+    <depends>com.intellij.modules.json</depends>
 
     <extensions defaultExtensionNs="com.intellij">
         <fileType
@@ -48,6 +49,9 @@
         <notificationGroup
                 id="Sprocket"
                 displayType="BALLOON"/>
+
+        <!-- Tests -->
+        <testSourcesFilter implementation="org.stjude.sprocket.ide.sources.SprocketTestSourcesFilter"/>
 
         <!-- Parser definition -->
         <lang.parserDefinition language="WDL" implementationClass="org.stjude.sprocket.lang.WdlParserDefinition"/>
@@ -115,6 +119,11 @@
                 language="WDL"
                 order="first"
                 implementationClass="com.redhat.devtools.lsp4ij.features.documentSymbol.LSPDocumentSymbolStructureViewFactory"/>
+    </extensions>
+
+    <extensions defaultExtensionNs="JavaScript">
+        <JsonSchema.ProviderFactory implementation="org.stjude.sprocket.ide.jsonSchema.SprocketTestSchemaProviderFactory"/>
+        <JsonSchema.ProviderFactory implementation="org.stjude.sprocket.ide.jsonSchema.SprocketTomlSchemaProviderFactory"/>
     </extensions>
 
     <extensions defaultExtensionNs="com.redhat.devtools.lsp4ij">
