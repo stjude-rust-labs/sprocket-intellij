@@ -19,9 +19,6 @@ class SprocketRunRunConfiguration(
 ) : SprocketBaseRunConfiguration(project, factory, name) {
     var sourcePath: String = ""
     var target: String = ""
-    var outputDir: String = ""
-    var suffix: String = ""
-    var showStderr: Boolean = false
 
     override fun getConfigurationEditor() = SprocketRunConfigurationEditor()
 
@@ -34,17 +31,11 @@ class SprocketRunRunConfiguration(
         super.readExternal(element)
         sourcePath = element.getAttributeValue("sourcePath") ?: ""
         target = element.getAttributeValue("target") ?: ""
-        outputDir = element.getAttributeValue("outputDir") ?: ""
-        suffix = element.getAttributeValue("suffix") ?: ""
-        showStderr = element.getAttributeValue("showStderr").toBoolean()
     }
 
     override fun writeExternal(element: Element) {
         super.writeExternal(element)
         element.setAttribute("sourcePath", sourcePath)
         element.setAttribute("target", target)
-        element.setAttribute("outputDir", outputDir)
-        element.setAttribute("suffix", suffix)
-        element.setAttribute("showStderr", showStderr.toString())
     }
 }

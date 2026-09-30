@@ -23,7 +23,7 @@ abstract class SprocketBaseConfigurationEditor<T : SprocketBaseRunConfiguration>
         }
 
     private val colorBox = ComboBox(SprocketBaseRunConfiguration.ColorOption.entries.toTypedArray())
-    private val skipConfigSearchCheck = JBCheckBox("Skip config search (-s)")
+    private val skipConfigSearchCheck = JBCheckBox("Skip configuration search (-s)")
 
     override fun createEditor(): JComponent =
         panel {

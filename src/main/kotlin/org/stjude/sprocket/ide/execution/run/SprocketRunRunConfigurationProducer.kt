@@ -19,7 +19,8 @@ class SprocketRunRunConfigurationProducer : LazyRunConfigurationProducer<Sprocke
         sourceElement: Ref<PsiElement>,
     ): Boolean {
         val element = context.psiLocation ?: return false
-        if (!element.isCallableIdentifier()) return false
+        if (element.elementType != WdlTokenTypes.IDENTIFIER) return false
+        if (element.parent !is WdlTaskImpl || element.parent !is WdlWorkflowImpl) return false
 
         val target = element.text
         val virtualFile = element.containingFile?.virtualFile ?: return false
@@ -36,18 +37,8 @@ class SprocketRunRunConfigurationProducer : LazyRunConfigurationProducer<Sprocke
         context: ConfigurationContext,
     ): Boolean {
         val element = context.psiLocation ?: return false
-        if (!element.isCallableIdentifier()) return false
         val virtualFile = element.containingFile?.virtualFile ?: return false
 
-        // By default, the run configuration is populated with the file URL from the LSP.
-        // But both path and URL forms are valid.
-        val matchesPath = configuration.sourcePath == virtualFile.path || configuration.sourcePath == virtualFile.url
-        return matchesPath && configuration.target == element.text
+        return configuration.sourcePath == virtualFile.path
     }
 }
-
-/**
- * Whether the element represents an identifier of a callable target (task/workflow).
- */
-fun PsiElement.isCallableIdentifier(): Boolean =
-    this.elementType == WdlTokenTypes.IDENTIFIER && (this.parent is WdlTaskImpl || this.parent is WdlWorkflowImpl)
