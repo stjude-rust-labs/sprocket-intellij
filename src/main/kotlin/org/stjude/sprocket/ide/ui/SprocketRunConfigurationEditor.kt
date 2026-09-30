@@ -8,15 +8,15 @@ import com.intellij.ui.dsl.builder.Panel
 import org.stjude.sprocket.ide.execution.run.SprocketRunRunConfiguration
 
 class SprocketRunConfigurationEditor : SprocketBaseConfigurationEditor<SprocketRunRunConfiguration>() {
-
-    private val sourceField = TextFieldWithBrowseButton().apply {
-        addBrowseFolderListener(
-            "Select Source",
-            "Select WDL document or workspace",
-            null,
-            FileChooserDescriptorFactory.createSingleFileOrFolderDescriptor()
-        )
-    }
+    private val sourceField =
+        TextFieldWithBrowseButton().apply {
+            addBrowseFolderListener(
+                "Select Source",
+                "Select WDL document or workspace",
+                null,
+                FileChooserDescriptorFactory.createSingleFileOrFolderDescriptor(),
+            )
+        }
 
     private val targetField = JBTextField()
 

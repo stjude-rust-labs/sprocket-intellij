@@ -11,15 +11,12 @@ import org.stjude.sprocket.lang.psi.impl.WdlTaskImpl
 import org.stjude.sprocket.lang.psi.impl.WdlWorkflowImpl
 
 class SprocketRunRunConfigurationProducer : LazyRunConfigurationProducer<SprocketRunRunConfiguration>() {
-
-    override fun getConfigurationFactory(): ConfigurationFactory {
-        return SprocketRunConfigurationType.getInstance().factory
-    }
+    override fun getConfigurationFactory(): ConfigurationFactory = SprocketRunConfigurationType.getInstance().factory
 
     override fun setupConfigurationFromContext(
         configuration: SprocketRunRunConfiguration,
         context: ConfigurationContext,
-        sourceElement: Ref<PsiElement>
+        sourceElement: Ref<PsiElement>,
     ): Boolean {
         val element = context.psiLocation ?: return false
         if (element.elementType != WdlTokenTypes.IDENTIFIER) return false
@@ -27,7 +24,7 @@ class SprocketRunRunConfigurationProducer : LazyRunConfigurationProducer<Sprocke
 
         val target = element.text
         val virtualFile = element.containingFile?.virtualFile ?: return false
-        configuration.name = "Run `${target}`"
+        configuration.name = "Run `$target`"
         configuration.sourcePath = virtualFile.path
         configuration.target = target
 
@@ -37,7 +34,7 @@ class SprocketRunRunConfigurationProducer : LazyRunConfigurationProducer<Sprocke
 
     override fun isConfigurationFromContext(
         configuration: SprocketRunRunConfiguration,
-        context: ConfigurationContext
+        context: ConfigurationContext,
     ): Boolean {
         val element = context.psiLocation ?: return false
         val virtualFile = element.containingFile?.virtualFile ?: return false

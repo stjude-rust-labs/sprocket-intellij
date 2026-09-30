@@ -13,7 +13,6 @@ import org.jetbrains.yaml.psi.YAMLSequenceItem
  * Utilities for interacting with Sprocket test definition YAMLs.
  */
 object YamlUtils {
-
     /**
      * A Sprocket test target.
      */
@@ -23,12 +22,16 @@ object YamlUtils {
         /**
          * Run *all* tests associated with this entrypoint.
          */
-        data class Entrypoint(override val name: String) : TestTarget()
+        data class Entrypoint(
+            override val name: String,
+        ) : TestTarget()
 
         /**
          * Run a single test under an entrypoint.
          */
-        data class Test(override val name: String) : TestTarget()
+        data class Test(
+            override val name: String,
+        ) : TestTarget()
     }
 
     /**
@@ -60,7 +63,5 @@ object YamlUtils {
         return null
     }
 
-    private fun isTopLevelKV(element: PsiElement): Boolean {
-        return element.parent is YAMLMapping && element.parent?.parent is YAMLDocument
-    }
+    private fun isTopLevelKV(element: PsiElement): Boolean = element.parent is YAMLMapping && element.parent?.parent is YAMLDocument
 }

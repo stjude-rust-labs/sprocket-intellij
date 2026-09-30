@@ -19,11 +19,11 @@ import org.stjude.sprocket.ide.execution.test.SprocketTestRunConfiguration
  * Handlers for server-defined commands.
  */
 class SprocketLSPCommandAction : LSPCommandAction() {
-    private val log = thisLogger();
+    private val log = thisLogger()
 
     override fun commandPerformed(
         command: LSPCommand,
-        e: AnActionEvent
+        e: AnActionEvent,
     ) {
         log.info("Received a command: ${command.command} (title=${command.title})")
 
@@ -54,7 +54,11 @@ class SprocketLSPCommandAction : LSPCommandAction() {
         }
     }
 
-    private fun executeTestConfiguration(project: Project, command: LSPCommand, isTestSingle: Boolean) {
+    private fun executeTestConfiguration(
+        project: Project,
+        command: LSPCommand,
+        isTestSingle: Boolean,
+    ) {
         val sourcePathArg = command.getArgumentAt(0, String::class.java)
         val targetArg = command.getArgumentAt(1, String::class.java)
 
@@ -89,7 +93,10 @@ class SprocketLSPCommandAction : LSPCommandAction() {
         ProgramRunnerUtil.executeConfiguration(settings, executor)
     }
 
-    private fun executeRunConfiguration(project: Project, command: LSPCommand) {
+    private fun executeRunConfiguration(
+        project: Project,
+        command: LSPCommand,
+    ) {
         val sourcePathArg = command.getArgumentAt(0, String::class.java)
         val targetArg = command.getArgumentAt(1, String::class.java)
 

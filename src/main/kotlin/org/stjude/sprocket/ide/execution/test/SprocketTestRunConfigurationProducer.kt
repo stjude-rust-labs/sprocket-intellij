@@ -10,15 +10,12 @@ import com.intellij.psi.PsiElement
 import org.stjude.sprocket.lang.WdlFileType
 
 class SprocketTestRunConfigurationProducer : LazyRunConfigurationProducer<SprocketTestRunConfiguration>() {
-
-    override fun getConfigurationFactory(): ConfigurationFactory {
-        return SprocketTestConfigurationType.getInstance().factory
-    }
+    override fun getConfigurationFactory(): ConfigurationFactory = SprocketTestConfigurationType.getInstance().factory
 
     override fun setupConfigurationFromContext(
         configuration: SprocketTestRunConfiguration,
         context: ConfigurationContext,
-        sourceElement: Ref<PsiElement>
+        sourceElement: Ref<PsiElement>,
     ): Boolean {
         val element = context.psiLocation ?: return false
 
@@ -35,7 +32,7 @@ class SprocketTestRunConfigurationProducer : LazyRunConfigurationProducer<Sprock
 
     override fun isConfigurationFromContext(
         configuration: SprocketTestRunConfiguration,
-        context: ConfigurationContext
+        context: ConfigurationContext,
     ): Boolean {
         val element = context.psiLocation ?: return false
 
@@ -51,12 +48,13 @@ class SprocketTestRunConfigurationProducer : LazyRunConfigurationProducer<Sprock
         val parent = file.parent ?: return null
 
         val inTestDir = parent.isDirectory && parent.name == "test"
-        val wdlDir = if (inTestDir) {
-            val grandparent = file.parent.parent ?: return null
-            grandparent.canonicalPath
-        } else {
-            parent.canonicalPath
-        } ?: return null
+        val wdlDir =
+            if (inTestDir) {
+                val grandparent = file.parent.parent ?: return null
+                grandparent.canonicalPath
+            } else {
+                parent.canonicalPath
+            } ?: return null
 
         return wdlDir + VfsUtilCore.VFS_SEPARATOR + expectedWdl
     }

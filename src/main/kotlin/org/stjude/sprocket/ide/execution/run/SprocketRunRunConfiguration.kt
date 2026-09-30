@@ -15,17 +15,17 @@ import org.stjude.sprocket.ide.ui.SprocketRunConfigurationEditor
 class SprocketRunRunConfiguration(
     project: Project,
     factory: ConfigurationFactory,
-    name: String
+    name: String,
 ) : SprocketBaseRunConfiguration(project, factory, name) {
-
     var sourcePath: String = ""
     var target: String = ""
 
     override fun getConfigurationEditor() = SprocketRunConfigurationEditor()
 
-    override fun getState(executor: Executor, environment: ExecutionEnvironment): RunProfileState {
-        return SprocketRunRunProfileState(this, environment)
-    }
+    override fun getState(
+        executor: Executor,
+        environment: ExecutionEnvironment,
+    ): RunProfileState = SprocketRunRunProfileState(this, environment)
 
     override fun readExternal(element: Element) {
         super.readExternal(element)

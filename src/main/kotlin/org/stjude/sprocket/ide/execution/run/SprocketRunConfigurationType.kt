@@ -13,17 +13,17 @@ import org.stjude.sprocket.WdlIcons
  *
  * @see SprocketRunRunConfiguration
  */
-class SprocketRunConfigurationType : SimpleConfigurationType(
-    "SprocketRunRunConfiguration",
-    "Sprocket Run",
-    "Run a WDL workflow/task using sprocket",
-    NotNullLazyValue.createValue { WdlIcons.FILE }
-) {
+class SprocketRunConfigurationType :
+    SimpleConfigurationType(
+        "SprocketRunRunConfiguration",
+        "Sprocket Run",
+        "Run a WDL workflow/task using sprocket",
+        NotNullLazyValue.createValue { WdlIcons.FILE },
+    ) {
     val factory: ConfigurationFactory get() = configurationFactories.single()
 
-    override fun createTemplateConfiguration(project: Project): RunConfiguration {
-        return SprocketRunRunConfiguration(project, this, "Sprocket Run")
-    }
+    override fun createTemplateConfiguration(project: Project): RunConfiguration =
+        SprocketRunRunConfiguration(project, this, "Sprocket Run")
 
     companion object {
         fun getInstance(): SprocketRunConfigurationType =

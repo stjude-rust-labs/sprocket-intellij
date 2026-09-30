@@ -12,21 +12,21 @@ import org.stjude.sprocket.ide.execution.SprocketBaseRunConfiguration
 import javax.swing.JComponent
 
 abstract class SprocketBaseConfigurationEditor<T : SprocketBaseRunConfiguration> : SettingsEditor<T>() {
-
-    private val configPathField = TextFieldWithBrowseButton().apply {
-        addBrowseFolderListener(
-            "Select Config File",
-            null,
-            null,
-            FileChooserDescriptorFactory.createSingleFileDescriptor()
-        )
-    }
+    private val configPathField =
+        TextFieldWithBrowseButton().apply {
+            addBrowseFolderListener(
+                "Select Config File",
+                null,
+                null,
+                FileChooserDescriptorFactory.createSingleFileDescriptor(),
+            )
+        }
 
     private val colorBox = ComboBox(SprocketBaseRunConfiguration.ColorOption.entries.toTypedArray())
     private val skipConfigSearchCheck = JBCheckBox("Skip configuration search (-s)")
 
-    override fun createEditor(): JComponent {
-        return panel {
+    override fun createEditor(): JComponent =
+        panel {
             buildUi()
             group("Output") {
                 row("Color:") { cell(colorBox) }
@@ -34,7 +34,6 @@ abstract class SprocketBaseConfigurationEditor<T : SprocketBaseRunConfiguration>
                 row { cell(skipConfigSearchCheck) }
             }
         }
-    }
 
     /**
      * Add the command-specific UI elements to the panel.

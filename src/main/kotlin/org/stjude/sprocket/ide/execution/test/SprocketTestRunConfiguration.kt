@@ -15,9 +15,8 @@ import org.stjude.sprocket.ide.ui.SprocketTestConfigurationEditor
 class SprocketTestRunConfiguration(
     project: Project,
     factory: ConfigurationFactory,
-    name: String
+    name: String,
 ) : SprocketBaseRunConfiguration(project, factory, name) {
-
     var sourcePath: String = ""
     var workspacePath: String = ""
     var target: String = ""
@@ -35,9 +34,10 @@ class SprocketTestRunConfiguration(
 
     override fun getConfigurationEditor() = SprocketTestConfigurationEditor()
 
-    override fun getState(executor: Executor, environment: ExecutionEnvironment): RunProfileState {
-        return SprocketTestRunProfileState(this, environment)
-    }
+    override fun getState(
+        executor: Executor,
+        environment: ExecutionEnvironment,
+    ): RunProfileState = SprocketTestRunProfileState(this, environment)
 
     override fun readExternal(element: Element) {
         super.readExternal(element)

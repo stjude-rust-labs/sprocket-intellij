@@ -5,43 +5,47 @@ import com.intellij.openapi.ui.ComboBox
 import com.intellij.openapi.ui.TextFieldWithBrowseButton
 import com.intellij.ui.components.JBCheckBox
 import com.intellij.ui.components.JBTextField
-import com.intellij.ui.dsl.builder.*
+import com.intellij.ui.dsl.builder.AlignX
+import com.intellij.ui.dsl.builder.Panel
 import org.stjude.sprocket.ide.execution.test.SprocketTestRunConfiguration
 
 class SprocketTestConfigurationEditor : SprocketBaseConfigurationEditor<SprocketTestRunConfiguration>() {
-
-    private val sourceField = TextFieldWithBrowseButton().apply {
-        addBrowseFolderListener(
-            "Select Source",
-            "Select WDL document or workspace",
-            null,
-            FileChooserDescriptorFactory.createSingleFileOrFolderDescriptor()
-        )
-    }
-    private val workspaceField = TextFieldWithBrowseButton().apply {
-        addBrowseFolderListener(
-            "Select Workspace",
-            "Root of the workspace",
-            null,
-            FileChooserDescriptorFactory.createSingleFolderDescriptor()
-        )
-    }
-    private val fixturesDirField = TextFieldWithBrowseButton().apply {
-        addBrowseFolderListener(
-            "Select Fixtures Directory",
-            null,
-            null,
-            FileChooserDescriptorFactory.createSingleFolderDescriptor()
-        )
-    }
-    private val runDirField = TextFieldWithBrowseButton().apply {
-        addBrowseFolderListener(
-            "Select Run Directory",
-            null,
-            null,
-            FileChooserDescriptorFactory.createSingleFolderDescriptor()
-        )
-    }
+    private val sourceField =
+        TextFieldWithBrowseButton().apply {
+            addBrowseFolderListener(
+                "Select Source",
+                "Select WDL document or workspace",
+                null,
+                FileChooserDescriptorFactory.createSingleFileOrFolderDescriptor(),
+            )
+        }
+    private val workspaceField =
+        TextFieldWithBrowseButton().apply {
+            addBrowseFolderListener(
+                "Select Workspace",
+                "Root of the workspace",
+                null,
+                FileChooserDescriptorFactory.createSingleFolderDescriptor(),
+            )
+        }
+    private val fixturesDirField =
+        TextFieldWithBrowseButton().apply {
+            addBrowseFolderListener(
+                "Select Fixtures Directory",
+                null,
+                null,
+                FileChooserDescriptorFactory.createSingleFolderDescriptor(),
+            )
+        }
+    private val runDirField =
+        TextFieldWithBrowseButton().apply {
+            addBrowseFolderListener(
+                "Select Run Directory",
+                null,
+                null,
+                FileChooserDescriptorFactory.createSingleFolderDescriptor(),
+            )
+        }
 
     private val targetField = JBTextField()
     private val filterField = JBTextField()

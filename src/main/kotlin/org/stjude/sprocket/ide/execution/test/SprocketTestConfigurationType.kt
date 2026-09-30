@@ -13,17 +13,17 @@ import org.stjude.sprocket.WdlIcons
  *
  * @see SprocketTestRunConfiguration
  */
-class SprocketTestConfigurationType : SimpleConfigurationType(
-    "SprocketTestRunConfiguration",
-    "Sprocket Test",
-    "Run unit tests for a WDL workspace using sprocket",
-    NotNullLazyValue.createValue { WdlIcons.FILE }
-) {
+class SprocketTestConfigurationType :
+    SimpleConfigurationType(
+        "SprocketTestRunConfiguration",
+        "Sprocket Test",
+        "Run unit tests for a WDL workspace using sprocket",
+        NotNullLazyValue.createValue { WdlIcons.FILE },
+    ) {
     val factory: ConfigurationFactory get() = configurationFactories.single()
 
-    override fun createTemplateConfiguration(project: Project): RunConfiguration {
-        return SprocketTestRunConfiguration(project, this, "Sprocket Test")
-    }
+    override fun createTemplateConfiguration(project: Project): RunConfiguration =
+        SprocketTestRunConfiguration(project, this, "Sprocket Test")
 
     companion object {
         fun getInstance(): SprocketTestConfigurationType =
